@@ -36,15 +36,6 @@ TcpSocket::~TcpSocket()
 void TcpSocket::Bind(const EndPoint& endpoint)
 {
 	// bind()
-	//ZeroMemory(&serveraddr_, sizeof(serveraddr_));
-	//serveraddr_.sin_family = IpType_;
-	//serveraddr_.sin_addr.s_addr = inet_addr(ip);// htonl(INADDR_ANY);
-	//serveraddr_.sin_port = htons(port);
-
-	//int retval;
-	//retval = bind(sock_, (SOCKADDR*)&serveraddr_, sizeof(serveraddr_));
-	//if (retval == SOCKET_ERROR) err_quit("bind()");
-
 	endpoint_ = endpoint;
 	auto retval = bind(sock_, endpoint_.GetAddr(), endpoint_.GetAddrSize());
 	if (retval == SOCKET_ERROR)  err_quit("bind()");
@@ -71,7 +62,6 @@ int TcpSocket::Accept(TcpSocket & acceptedSocket)
 	auto sock = accept(sock_, acceptedSocket.endpoint_.GetAddr(), &addrLen);
 	acceptedSocket.sock_ = sock;
 	acceptedSocket.endpoint_.SetIPTypeFromAddrSize(addrLen);
-
 
 	return sock;
 }

@@ -31,16 +31,16 @@ public:
 	EndPoint&		GetEndPoint() { return endpoint_; };
 	SOCKET&			GetSocket() { return sock_; }
 	char&			GetBuf() { return buf_; }
-	vector<char>	GetTotalBuf() { return totalBuf_; }
+	vector<char>&	GetTotalBuf() { return totalBuf_; }
 	int				GetRecvBytes() { return recvbytes_; }
 	int				GetSocketType() { return socketType_; }
 
 	string			GetIPAddress(); // 아이피 주소(숫자)를 반환
 	int				GetPort(); // 포트번호(숫자)를 반환
 
-	void			SetBuf(char buf) { buf = buf_; }
-	void			SetSocket(SOCKET& sock ) { sock = sock_; }
-	void			SetRecvBytes(int recvbytes) { recvbytes = recvbytes_; }
+	void			SetBuf(char buf) { buf_ = buf; }
+	void			SetSocket(SOCKET& sock ) { sock_ = sock; }
+	void			SetRecvBytes(int recvbytes) { recvbytes_ = recvbytes; }
 		
 public:
 	// 오류 출력 함수
