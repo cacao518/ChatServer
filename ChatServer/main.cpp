@@ -1,4 +1,5 @@
 #pragma comment(lib, "ws2_32")
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,8 +30,8 @@ BOOL AddSocketInfo(SOCKET sock);
 void RemoveSocketInfo(int nIndex);
 
 // 오류 출력 함수
-void err_quit(char* msg);
-void err_display(char* msg);
+void err_quit(const char* msg);
+void err_display(const char* msg);
 
 int main(int argc, char* argv[])
 {
