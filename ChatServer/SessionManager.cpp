@@ -2,6 +2,17 @@
 #include "TcpSocket.h"
 #include "Session.h"
 
+SessionManager* SessionManager::instance = nullptr;
+
+SessionManager* SessionManager::GetInstance()
+{
+	if (instance == NULL)
+		instance = new SessionManager();
+
+	return instance;
+
+}
+
 BOOL SessionManager::AddSession(SOCKET sock)
 {
 	if (clients_.size() >= FD_SETSIZE) {

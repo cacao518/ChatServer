@@ -9,9 +9,14 @@
 
 class Session;
 class SessionManager {
+	static SessionManager* instance;
+public:
+	static SessionManager* GetInstance();
+
 public:
 	BOOL AddSession(SOCKET sock);
 	void RemoveSession(Session* client);
+
 
 public:
 	set<Session*>& GetClients() { return clients_; };

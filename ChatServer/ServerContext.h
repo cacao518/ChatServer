@@ -5,7 +5,7 @@
 class ServerContext {
 
 public:
-	ServerContext(SessionManager& sessMgr);
+	ServerContext();
 	~ServerContext();
 
 	Error Init(int port);
@@ -17,6 +17,5 @@ public:
 
 private:
 	TcpSocket listenSock_;
-	SessionManager& sessMgr_;
 
 };

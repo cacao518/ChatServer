@@ -17,8 +17,7 @@ class TcpSocket;
 class EndPoint;
 int main(int argc, char* argv[])
 {
-	SessionManager sessMgr;
-	ServerContext sc(sessMgr);
+	ServerContext sc;
 
 	if (sc.Init(SERVERPORT) != Error::None)
 		return -1;

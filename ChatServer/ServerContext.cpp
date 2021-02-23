@@ -1,14 +1,16 @@
 #include "ServerContext.h"
 #include "Session.h"
+#include "SessionManager.h"
 #include <set>
 
-ServerContext::ServerContext(SessionManager& sessMgr)
-	:listenSock_(SocketType::TCP, IPType::IPv4), sessMgr_(sessMgr)
+ServerContext::ServerContext()
+	:listenSock_(SocketType::TCP, IPType::IPv4)//, sessMgr_(sessMgr)
 {
 }
 
 ServerContext::~ServerContext()
 {
+	Close();
 }
 
 Error ServerContext::Init(int port)
@@ -27,7 +29,8 @@ Error ServerContext::Accept(SOCKET & client_sock)
 
 Error ServerContext::Run()
 {
-	set<Session*>& client = sessMgr_.GetClients();
+	SessionManager* sessMgr = SessionManager::GetInstance();
+	set<Session*>& client = sessMgr->GetClients();
 
 	// 데이터 통신에 사용할 변수
 	FD_SET rset, wset;
@@ -67,10 +70,10 @@ Error ServerContext::Run()
 				printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n",
 					client_socket.GetIPAddress().c_str(), client_socket.GetPort());
 				// 소켓 정보 추가
-				sessMgr_.AddSession(client_socket.GetSocket());
+				sessMgr->AddSession(client_socket.GetSocket());
 
 				char ss[50] = "채팅 로비에 입장하셨습니다.\r\n\n>\0";
-				retval = send(client_socket.GetSocket(), ss, strlen(ss), 0);
+				client_socket.Send(ss, strlen(ss));
 			}
 		}
 
@@ -83,16 +86,7 @@ Error ServerContext::Run()
 			if (FD_ISSET(se->GetSock(), &rset))
 			{
 				// 데이터 받기
-				retval = recv(se->GetSock(), &(se->GetTcpSock().GetBuf()), sizeof(char), 0); // 한글자만 받아
-				if (retval == SOCKET_ERROR) {
-					ErrorUtil::err_display("recv()");
-					sessMgr_.RemoveSession(se);
-					break;
-				}
-				else if (retval == 0) {
-					sessMgr_.RemoveSession(se);
-					break;
-				}
+				if (se->GetTcpSock().Receive() != Error::None) break;
 				se->GetTcpSock().GetTotalBuf().push_back(se->GetTcpSock().GetBuf());
 			}
 			if (FD_ISSET(se->GetSock(), &wset))
@@ -121,25 +115,13 @@ Error ServerContext::Run()
 				for (auto c : client)
 				{
 					// 채팅을 보낸 클라이언트는 제외
-					if (c->GetSock() == se->GetSock())
-						continue;
-
-					retval = send(c->GetSock(), retBuf, se->GetTcpSock().GetTotalBuf().size() + 4, 0);
-					if (retval == SOCKET_ERROR) {
-						ErrorUtil::err_display("send()");
-						sessMgr_.RemoveSession(se);
-						break;
-					}
+					if (c->GetSock() == se->GetSock()) continue;
+					if (c->GetTcpSock().Send(retBuf, strlen(retBuf)) != Error::None) break;
 				}
 
 				// 채팅을 보낸 클라이언트 > 커서 다시 표시
 				char ss[50] = ">\0";
-				retval = send(se->GetSock(), ss, strlen(ss), 0);
-				if (retval == SOCKET_ERROR) {
-					ErrorUtil::err_display("send()");
-					sessMgr_.RemoveSession(se);
-					break;
-				}
+				if (se->GetTcpSock().Send(ss, strlen(ss)) != Error::None) break;
 
 				// 버퍼 비우기
 				se->GetTcpSock().SetBuf('\0');
@@ -153,7 +135,8 @@ Error ServerContext::Run()
 
 void ServerContext::Close()
 {
-	set<Session*>& client = sessMgr_.GetClients();
+	SessionManager* sessMgr = SessionManager::GetInstance();
+	set<Session*>& client = sessMgr->GetClients();
 	for (auto c : client)
 	{
 		delete c;

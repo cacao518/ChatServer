@@ -8,9 +8,8 @@
 #include "config.h"
 
 class EndPoint;
-
+class Session;
 using namespace std;
-
 
 class TcpSocket {
 
@@ -22,8 +21,8 @@ public:
 	void Bind(const EndPoint& endpoint);
 	void Listen();
 	int Accept(TcpSocket& acceptedSocket);
-	int Send(const char* data, int length);
-	int Receive();
+	Error Send(const char* data, int length);
+	Error Receive();
 	void Close();
 
 public:
@@ -41,10 +40,12 @@ public:
 	void			SetBuf(char buf) { this->buf_ = buf; }
 	void			SetSocket(SOCKET sock) { this->sock_ = sock; }
 	void			SetRecvBytes(int recvbytes) { this->recvbytes_ = recvbytes; }
+	void			SetSession(Session* sess) { this->parent_ = sess; };
 
 private:
 	SOCKET			sock_;
 	EndPoint		endpoint_;
+	Session*		parent_;
 
 	char			buf_;
 	vector<char>	totalBuf_;

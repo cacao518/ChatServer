@@ -1,4 +1,5 @@
 #include "TcpSocket.h"
+#include "SessionManager.h"
 
 TcpSocket::TcpSocket()
 {
@@ -66,14 +67,35 @@ int TcpSocket::Accept(TcpSocket & acceptedSocket)
 	return sock;
 }
 
-int TcpSocket::Send(const char * data, int length)
+Error TcpSocket::Send(const char * data, int length)
 {
-	return 0;
+	int retval;
+	retval = send(sock_, data, strlen(data), 0);
+
+	if (retval == SOCKET_ERROR) 
+	{
+		ErrorUtil::err_display("send()");
+		SessionManager::GetInstance()->RemoveSession(parent_);
+		return Error::SEND_ERROR;
+	}
+	return Error::None;
 }
 
-int TcpSocket::Receive()
+Error TcpSocket::Receive()
 {
-	return 0;
+	int retval;
+	retval = recv(sock_, &(buf_), sizeof(char), 0); // 한글자만 받아
+
+	if (retval == SOCKET_ERROR) {
+		ErrorUtil::err_display("recv()");
+		SessionManager::GetInstance()->RemoveSession(parent_);
+		return Error::RECV_ERROR;
+	}
+	else if (retval == 0) {
+		SessionManager::GetInstance()->RemoveSession(parent_);
+		return Error::RECV_ERROR;
+	}
+	return Error::None;
 }
 
 void TcpSocket::Close()
