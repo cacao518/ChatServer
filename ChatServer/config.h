@@ -1,7 +1,14 @@
 #pragma once
+#include <string>
+using namespace std;
 
 #define SERVERPORT 9000
 #define BUFSIZE    512
+
+struct PlayerInfo {
+	int code;
+	string name;
+};
 
 enum class Error {
 	None,
@@ -22,8 +29,8 @@ enum class SocketType {
 	UDP,
 };
 
-struct ErrorUtil
-{
+struct ErrorUtil{
+
 	// 소켓 함수 오류 출력 후 종료
 	static void err_quit(const char* msg)
 	{

@@ -6,13 +6,13 @@
 class Session {
 
 public:	
-	Session(TcpSocket& socket);
+	Session(TcpSocket socket);
 	~Session();
 
 	TcpSocket&	GetTcpSock() { return socket_; };
 	SOCKET&		GetSock() { return socket_.GetSocket(); };
 
-	void Start();
+	Error Run(FD_SET& rset, FD_SET& wset);
 
 private:
 	TcpSocket socket_;

@@ -13,8 +13,6 @@
 #include "Session.h"
 #include "SessionManager.h"
 
-class TcpSocket;
-class EndPoint;
 int main(int argc, char* argv[])
 {
 	ServerContext sc;

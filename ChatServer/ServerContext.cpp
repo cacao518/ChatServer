@@ -35,8 +35,7 @@ Error ServerContext::Run()
 	// 데이터 통신에 사용할 변수
 	FD_SET rset, wset;
 	TcpSocket client_socket;
-	SOCKADDR_IN clientaddr;
-	int addrlen, retval;
+	int retval;
 
 	while (1)
 	{
@@ -81,55 +80,10 @@ Error ServerContext::Run()
 		for (auto iter : client)
 		{
 			Session* se = iter;
-			char retBuf[BUFSIZE];
-
-			if (FD_ISSET(se->GetSock(), &rset))
-			{
-				// 데이터 받기
-				if (se->GetTcpSock().Receive() != Error::None) break;
-				se->GetTcpSock().GetTotalBuf().push_back(se->GetTcpSock().GetBuf());
-			}
-			if (FD_ISSET(se->GetSock(), &wset))
-			{
-				// 데이터 보내기
-				int idx = 0;
-				retBuf[idx++] = '\r';
-				retBuf[idx++] = '\n';
-
-				for (auto c : se->GetTcpSock().GetTotalBuf())
-				{
-					retBuf[idx++] = c;
-				}
-
-				retBuf[idx] = '\0';
-
-				// retBuf 서버에 먼저 출력
-				addrlen = sizeof(clientaddr);
-				getpeername(se->GetSock(), (SOCKADDR*)&clientaddr, &addrlen);
-				printf("[TCP/%s:%d] %s", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port), retBuf);
-
-
-				// 클라들에게 보내기
-				retBuf[idx++] = '>';
-				retBuf[idx] = '\0';
-				for (auto c : client)
-				{
-					// 채팅을 보낸 클라이언트는 제외
-					if (c->GetSock() == se->GetSock()) continue;
-					if (c->GetTcpSock().Send(retBuf, strlen(retBuf)) != Error::None) break;
-				}
-
-				// 채팅을 보낸 클라이언트 > 커서 다시 표시
-				char ss[50] = ">\0";
-				if (se->GetTcpSock().Send(ss, strlen(ss)) != Error::None) break;
-
-				// 버퍼 비우기
-				se->GetTcpSock().SetBuf('\0');
-				se->GetTcpSock().GetTotalBuf().clear();
-			}
-
+			if (se->Run(rset, wset) != Error::None) break;
 		}
 	}
+
 	return Error::None;
 }
 

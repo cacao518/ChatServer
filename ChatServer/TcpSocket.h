@@ -9,7 +9,6 @@
 
 class EndPoint;
 class Session;
-using namespace std;
 
 class TcpSocket {
 
