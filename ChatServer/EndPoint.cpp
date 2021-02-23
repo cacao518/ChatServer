@@ -16,7 +16,7 @@ EndPoint::EndPoint(const char * ip, int port, IPType type)
 		auto pAddr = (SOCKADDR_IN*)&serveraddr_;
 
 		pAddr->sin_family = AF_INET;
-		pAddr->sin_addr.s_addr = inet_addr(ip);// htonl(INADDR_ANY);
+		pAddr->sin_addr.s_addr = htonl(INADDR_ANY);// inet_addr(ip);// htonl(INADDR_ANY);
 		pAddr->sin_port = htons(port);
 	}
 	else {

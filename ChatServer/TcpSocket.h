@@ -38,15 +38,9 @@ public:
 	string			GetIPAddress(); // 아이피 주소(숫자)를 반환
 	int				GetPort(); // 포트번호(숫자)를 반환
 
-	void			SetBuf(char buf) { buf_ = buf; }
-	void			SetSocket(SOCKET& sock ) { sock_ = sock; }
-	void			SetRecvBytes(int recvbytes) { recvbytes_ = recvbytes; }
-		
-public:
-	// 오류 출력 함수
-	void err_quit(const char* msg);
-	void err_display(const char* msg);
-
+	void			SetBuf(char buf) { this->buf_ = buf; }
+	void			SetSocket(SOCKET sock) { this->sock_ = sock; }
+	void			SetRecvBytes(int recvbytes) { this->recvbytes_ = recvbytes; }
 
 private:
 	SOCKET			sock_;

@@ -23,7 +23,7 @@ TcpSocket::TcpSocket(SocketType socketType, IPType ipType)
 		type = SOCK_DGRAM;
 	
 	sock_ = socket(af, type, 0);
-	if (sock_ == INVALID_SOCKET) err_quit("socket()");
+	if (sock_ == INVALID_SOCKET) ErrorUtil::err_quit("socket()");
 }
 
 TcpSocket::~TcpSocket()
@@ -38,7 +38,7 @@ void TcpSocket::Bind(const EndPoint& endpoint)
 	// bind()
 	endpoint_ = endpoint;
 	auto retval = bind(sock_, endpoint_.GetAddr(), endpoint_.GetAddrSize());
-	if (retval == SOCKET_ERROR)  err_quit("bind()");
+	if (retval == SOCKET_ERROR) ErrorUtil::err_quit("bind()");
 }
 
 
@@ -47,12 +47,12 @@ void TcpSocket::Listen()
 	// listen()
 	int retval;
 	retval = listen(sock_, SOMAXCONN);
-	if (retval == SOCKET_ERROR) err_quit("listen()");
+	if (retval == SOCKET_ERROR) ErrorUtil::err_quit("listen()");
 
 	// 넌블로킹 소켓으로 전환
 	u_long on = 1;
 	retval = ioctlsocket(sock_, FIONBIO, &on);
-	if (retval == SOCKET_ERROR) err_display("ioctlsocket()");
+	if (retval == SOCKET_ERROR) ErrorUtil::err_display("ioctlsocket()");
 }
 
 int TcpSocket::Accept(TcpSocket & acceptedSocket)
@@ -94,30 +94,3 @@ int TcpSocket::GetPort()
 
 
 
-
-// 소켓 함수 오류 출력 후 종료
-void TcpSocket::err_quit(const char* msg)
-{
-	LPVOID lpMsgBuf;
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, WSAGetLastError(),
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR)&lpMsgBuf, 0, NULL);
-	MessageBox(NULL, (LPCTSTR)lpMsgBuf, msg, MB_ICONERROR);
-	LocalFree(lpMsgBuf);
-	exit(1);
-}
-
-// 소켓 함수 오류 출력
-void TcpSocket::err_display(const char* msg)
-{
-	LPVOID lpMsgBuf;
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, WSAGetLastError(),
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR)&lpMsgBuf, 0, NULL);
-	printf("[%s] %s", msg, (char*)lpMsgBuf);
-	LocalFree(lpMsgBuf);
-}
