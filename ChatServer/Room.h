@@ -10,7 +10,7 @@ public:
 	Room(Session * master, int roomCode, int max, string name);
 
 	void EnterRoom(Session* sess);							/// 세션을 방에 참여시키는 함수
-	void LeaveRoom(Session* sess);							/// 세션을 방에 참여시키는 함수
+	void LeaveRoom(Session* sess);							/// 세션을 방에서 내보내는 함수
 	void SendData(Session* sess, const char* data);			/// 세션이 방에 send하는 함수
 	void SendAllToRoomMembers(const char* data);			/// 방에 있는 모든 세션들에게 send하는 함수
 

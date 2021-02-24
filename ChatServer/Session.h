@@ -18,14 +18,14 @@ public:
 
 	bool		GetIsLogin() { return _isLogin; };
 	PlayerInfo	GetPlayerInfo() { return _info; }
-	Room*		GetParent() { return _parent; }
+	Room*		GetCurRoom() { return _curRoom; }
 	void		SetIsLogin(bool isLogin) { _isLogin = isLogin; };
 	void		SetPlayerInfo(PlayerInfo info);
-	void		SetParent(Room* parent) { _parent = parent; }
+	void		SetCurRoom(Room* parent) { _curRoom = parent; }
 
 private:
 	TcpSocket	_socket;
 	PlayerInfo	_info;
-	Room*		_parent;
+	Room*		_curRoom;
 	bool		_isLogin = false;
 };

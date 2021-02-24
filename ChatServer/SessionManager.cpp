@@ -19,7 +19,6 @@ SessionManager* SessionManager::GetInstance()
 ///
 ///	@param	sock	뭐하는 변수
 ///	@param	sock	뭐하는 변수
-///	@param	sock	뭐하는 변수
 //////////////////////////////////
 Session* SessionManager::AddSession(SOCKET sock)
 {
@@ -59,7 +58,11 @@ void SessionManager::RemoveSession(Session* client)
 		inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
 	// Room에 있는 member에서 제거하고, 방에 있는 사람들에게 알리기
-	ptr->GetParent()->LeaveRoom(client);
+	ptr->GetCurRoom()->LeaveRoom(client);
+
+	// 접속종료 메시지 방에 있는 사람들에게 출력
+	string message = "\r\n		 * " + client->GetPlayerInfo().name + "님이 " + "접속을 종료했습니다.\r\n\n입력> \0";
+	ptr->GetCurRoom()->SendAllToRoomMembers(message.c_str());
 
 	// 소켓 닫기
 	closesocket(ptr->GetSock());

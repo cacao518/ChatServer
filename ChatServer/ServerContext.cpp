@@ -39,12 +39,13 @@ BOOL ServerContext::Accept(TcpSocket& client_sock, FD_SET& rset)
 		}
 		else
 		{
-			printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n", client_sock.GetIPAddress().c_str(), client_sock.GetPort());
+			printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n", 
+				client_sock.GetIPAddress().c_str(), client_sock.GetPort());
 
 			// 소켓을 세션으로 추가
 			_sessMgr->AddSession(client_sock.GetSocket());
 
-			string message = "		* 명령어로 로그인을 해주세요. (/login 아이디)\r\n\n입력> \0";
+			string message = "		* 명령어를 사용해서 로그인하세요. ( /login 아이디 ) \r\n\n입력> \0";
 			client_sock.Send(message.c_str(), strlen(message.c_str()));
 		}
 	}

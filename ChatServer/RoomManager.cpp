@@ -26,8 +26,17 @@ Room* RoomManager::AddRoom(Session* master, int max, string name)
 
 void RoomManager::RemoveRoom(Room * room)
 {
-	// 방에 있는 유저 다 내보낸 다음
+	// (1) 방에 있는 유저 다 내보낸 다음
+	for (auto client : room->GetMembers())
+	{
+		if (client == nullptr) continue;
+		room->LeaveRoom(client);			// 방에서 나오기
+		client->SetCurRoom(_rooms[0]);		// 현재 방 로비로 설정
+		_rooms[0]->EnterRoom(client);		// 로비 입장
 
+	}
+
+	// (2) 방 목록도 삭제한다.
 	if (_rooms.find(room->GetRoomInfo()._roomCode) != _rooms.end())
 		_rooms.erase(room->GetRoomInfo()._roomCode);
 	
