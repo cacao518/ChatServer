@@ -20,8 +20,8 @@ public:
 	void Bind(const EndPoint& endpoint);
 	void Listen();
 	int Accept(TcpSocket& acceptedSocket);
-	Error Send(const char* data, int length);
-	Error Receive();
+	BOOL Send(const char* data, int length);
+	BOOL Receive();
 	void Close();
 
 public:

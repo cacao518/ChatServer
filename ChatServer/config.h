@@ -10,15 +10,15 @@ struct PlayerInfo {
 	string name;
 };
 
-enum class Error {
-	None,
-	SOCK_BIND_ERROR,
-	LISTEN_ERROR,
-	TCP_LISTEN_INVALID_SOCK_ERROR,
-	ACCEPT_ID_SOCKET,
-	SEND_ERROR,
-	RECV_ERROR
-};
+//enum class Result {
+//	None,
+//	SOCK_BIND_ERROR,
+//	LISTEN_ERROR,
+//	TCP_LISTEN_INVALID_SOCK_ERROR,
+//	ACCEPT_ID_SOCKET,
+//	SEND_ERROR,
+//	RECV_ERROR
+//};
 
 enum class IPType {
 	IPv4,

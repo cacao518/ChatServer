@@ -12,7 +12,7 @@ public:
 	TcpSocket&	GetTcpSock() { return socket_; };
 	SOCKET&		GetSock() { return socket_.GetSocket(); };
 
-	Error Run(FD_SET& rset, FD_SET& wset);
+	BOOL Run(FD_SET& rset, FD_SET& wset);
 
 private:
 	TcpSocket socket_;

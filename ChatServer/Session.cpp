@@ -11,19 +11,19 @@ Session::~Session()
 {
 }
 
-Error Session::Run(FD_SET& rset, FD_SET& wset)
+BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 {
 	SessionManager* sessMgr = SessionManager::GetInstance();
 	set<Session*>& client = sessMgr->GetClients();
 
-	int addrlen, retval;
+	int addrlen;
 	SOCKADDR_IN clientaddr;
 	char retBuf[BUFSIZE];
 
 	if (FD_ISSET(GetSock(), &rset))
 	{
 		// 데이터 받기
-		if (GetTcpSock().Receive() != Error::None) return Error::RECV_ERROR;
+		if (GetTcpSock().Receive() == FALSE) return FALSE;
 		GetTcpSock().GetTotalBuf().push_back(GetTcpSock().GetBuf());
 	}
 	if (FD_ISSET(GetSock(), &wset))
@@ -53,15 +53,17 @@ Error Session::Run(FD_SET& rset, FD_SET& wset)
 		{
 			// 채팅을 보낸 클라이언트는 제외
 			if (c->GetSock() == GetSock()) continue;
-			if (c->GetTcpSock().Send(retBuf, strlen(retBuf)) != Error::None) return Error::SEND_ERROR;
+			if (c->GetTcpSock().Send(retBuf, strlen(retBuf)) == FALSE) return FALSE;
 		}
 
 		// 채팅을 보낸 클라이언트 > 커서 다시 표시
 		char ss[50] = ">\0";
-		if (GetTcpSock().Send(ss, strlen(ss)) != Error::None) return Error::SEND_ERROR;
+		if (GetTcpSock().Send(ss, strlen(ss)) == FALSE) return FALSE;
 
 		// 버퍼 비우기
 		GetTcpSock().SetBuf('\0');
 		GetTcpSock().GetTotalBuf().clear();
 	}
+
+	return TRUE;
 }

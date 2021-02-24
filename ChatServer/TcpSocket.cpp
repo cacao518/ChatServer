@@ -67,7 +67,7 @@ int TcpSocket::Accept(TcpSocket & acceptedSocket)
 	return sock;
 }
 
-Error TcpSocket::Send(const char * data, int length)
+BOOL TcpSocket::Send(const char * data, int length)
 {
 	int retval;
 	retval = send(sock_, data, strlen(data), 0);
@@ -76,12 +76,12 @@ Error TcpSocket::Send(const char * data, int length)
 	{
 		ErrorUtil::err_display("send()");
 		SessionManager::GetInstance()->RemoveSession(parent_);
-		return Error::SEND_ERROR;
+		return FALSE;
 	}
-	return Error::None;
+	return TRUE;
 }
 
-Error TcpSocket::Receive()
+BOOL TcpSocket::Receive()
 {
 	int retval;
 	retval = recv(sock_, &(buf_), sizeof(char), 0); // 한글자만 받아
@@ -89,13 +89,13 @@ Error TcpSocket::Receive()
 	if (retval == SOCKET_ERROR) {
 		ErrorUtil::err_display("recv()");
 		SessionManager::GetInstance()->RemoveSession(parent_);
-		return Error::RECV_ERROR;
+		return FALSE;
 	}
 	else if (retval == 0) {
 		SessionManager::GetInstance()->RemoveSession(parent_);
-		return Error::RECV_ERROR;
+		return FALSE;
 	}
-	return Error::None;
+	return TRUE;
 }
 
 void TcpSocket::Close()
@@ -106,7 +106,7 @@ void TcpSocket::Close()
 
 string TcpSocket::GetIPAddress()
 {
-	return  endpoint_.GetAddrStr();
+	return endpoint_.GetAddrStr();
 }
 
 int TcpSocket::GetPort()

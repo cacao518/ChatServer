@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 {
 	ServerContext sc;
 
-	if (sc.Init(SERVERPORT) != Error::None)
+	if (sc.Init(SERVERPORT) == FALSE)
 		return -1;
 
 	sc.Run();

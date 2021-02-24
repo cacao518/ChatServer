@@ -2,6 +2,7 @@
 #include "TcpSocket.h"
 #include "Session.h"
 
+
 SessionManager* SessionManager::instance = nullptr;
 
 SessionManager* SessionManager::GetInstance()
@@ -37,6 +38,8 @@ BOOL SessionManager::AddSession(SOCKET sock)
 
 void SessionManager::RemoveSession(Session* client)
 {
+	if (clients_.empty()) return;
+
 	Session* ptr = *(clients_.find(client));
 	if (ptr == nullptr) return;
 

@@ -10,12 +10,13 @@ public:
 	ServerContext();
 	~ServerContext();
 
-	Error Init(int port);
-	Error Accept(SOCKET& client_sock);
-	Error Run();
+	BOOL Init(int port);
+	BOOL Accept(TcpSocket& client_sock, FD_SET& rset);
+	BOOL Run();
 	void Close();
 
 private:
 	TcpSocket listenSock_;
+	SessionManager* sessMgr_;
 
 };
