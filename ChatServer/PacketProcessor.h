@@ -12,8 +12,8 @@ public:
 	PacketProceessor();
 
 	BOOL PacketProcess(Session* sess, const char* data);
-
 	void GotLogin(Session* sess, const char* data);
+	void Chat(Session* sess);
 
 public:
 	using PacketHandler = std::function<void(Session*, const char* data)>;

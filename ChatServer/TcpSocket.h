@@ -29,7 +29,7 @@ public:
 	EndPoint&		GetEndPoint() { return _endpoint; };
 	SOCKET&			GetSocket() { return _sock; }
 	char&			GetBuf() { return _buf; }
-	vector<char>&	GetTotalBuf() { return _totalBuf; }
+	string&			GetTotalBuf() { return _totalBuf; }
 	int				GetRecvBytes() const { return _recvbytes; }
 	int				GetSocketType() const { return _socketType; }
 
@@ -47,7 +47,7 @@ private:
 	Session*		_parent;
 
 	char			_buf;
-	vector<char>	_totalBuf;
+	string			_totalBuf;
 	int				_recvbytes;
 	int				_socketType;
 };

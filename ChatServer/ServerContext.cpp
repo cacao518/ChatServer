@@ -83,18 +83,24 @@ BOOL ServerContext::Run()
 		Accept(client_socket, rset);
 
 		// 소켓 셋 검사(2): 데이터 통신
-		for (auto iter : _roomMgr->GetRooms()) // Room 순회
+		for (auto it : _sessMgr->GetClients())
 		{
-			Room* room = iter.second;
-			if (room == nullptr) continue;
-
-			for (auto it : room->GetMembers()) // Room 유저 순회
-			{
-				Session* se = it;
-				if (se == nullptr) continue;
-				if (se->Run(rset, wset) == FALSE) break;
-			}
+			Session* se = it;
+			if (se == nullptr) continue;
+			if (se->Run(rset, wset) == FALSE) break;
 		}
+		//for (auto iter : _roomMgr->GetRooms()) // Room 순회
+		//{
+		//	Room* room = iter.second;
+		//	if (room == nullptr) continue;
+
+		//	for (auto it : room->GetMembers()) // Room 유저 순회
+		//	{
+		//		Session* se = it;
+		//		if (se == nullptr) continue;
+		//		if (se->Run(rset, wset) == FALSE) break;
+		//	}
+		//}
 	}
 	return TRUE;
 }
