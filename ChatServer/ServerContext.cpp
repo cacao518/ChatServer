@@ -4,9 +4,9 @@
 #include <set>
 
 ServerContext::ServerContext()
-	:listenSock_(SocketType::TCP, IPType::IPv4)//, sessMgr_(sessMgr)
+	:_listenSock(SocketType::TCP, IPType::IPv4)//, _sessMgr(sessMgr)
 {
-	sessMgr_ = SessionManager::GetInstance();
+	_sessMgr = SessionManager::GetInstance();
 }
 
 ServerContext::~ServerContext()
@@ -16,8 +16,8 @@ ServerContext::~ServerContext()
 
 BOOL ServerContext::Init(int port)
 {
-	listenSock_.Bind(EndPoint("", port, IPType::IPv4));
-	listenSock_.Listen();
+	_listenSock.Bind(EndPoint("", port, IPType::IPv4));
+	_listenSock.Listen();
 
 	return TRUE;
 }
@@ -25,9 +25,9 @@ BOOL ServerContext::Init(int port)
 
 BOOL ServerContext::Accept(TcpSocket& client_sock, FD_SET& rset)
 {
-	if (FD_ISSET(listenSock_.GetSocket(), &rset))
+	if (FD_ISSET(_listenSock.GetSocket(), &rset))
 	{
-		if (listenSock_.Accept(client_sock) == INVALID_SOCKET)
+		if (_listenSock.Accept(client_sock) == INVALID_SOCKET)
 		{
 			ErrorUtil::err_display("accept()");
 			return FALSE;
@@ -36,10 +36,11 @@ BOOL ServerContext::Accept(TcpSocket& client_sock, FD_SET& rset)
 		{
 			printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n",
 				client_sock.GetIPAddress().c_str(), client_sock.GetPort());
-			// 소켓 정보 추가
-			sessMgr_->AddSession(client_sock.GetSocket());
 
-			char ss[50] = "채팅 로비에 입장하셨습니다.\r\n\n>\0";
+			// 소켓을 세션으로 추가
+			_sessMgr->AddSession(client_sock.GetSocket());
+
+			char ss[50] = "* 명령어로 로그인을 해주세요. (LOGIN 아이디)\r\n\n>\0";
 			client_sock.Send(ss, strlen(ss));
 		}
 	}
@@ -48,19 +49,19 @@ BOOL ServerContext::Accept(TcpSocket& client_sock, FD_SET& rset)
 
 BOOL ServerContext::Run()
 {
-	set<Session*>& client = sessMgr_->GetClients();
+	set<Session*>& client = _sessMgr->GetClients();
+	_roomMgr->AddRoom(nullptr, ROOM_USER_MAX, "Lobby"); // 로비 생성
 
 	// 데이터 통신에 사용할 변수
 	FD_SET rset, wset;
 	TcpSocket client_socket;
-	int retval;
 
 	while (1)
 	{
 		// 소켓 셋 초기화
 		FD_ZERO(&rset);
 		FD_ZERO(&wset);
-		FD_SET(listenSock_.GetSocket(), &rset);
+		FD_SET(_listenSock.GetSocket(), &rset);
 
 		for (auto it : client)
 		{
@@ -72,27 +73,32 @@ BOOL ServerContext::Run()
 		}
 
 		// select()
-		retval = select(0, &rset, &wset, NULL, NULL);
-		if (retval == SOCKET_ERROR) ErrorUtil::err_quit("select()");
+		if (select(0, &rset, &wset, NULL, NULL) == SOCKET_ERROR) 
+			ErrorUtil::err_quit("select()");
 
 		// 소켓 셋 검사(1): 클라이언트 접속 수용
 		Accept(client_socket, rset);
 
 		// 소켓 셋 검사(2): 데이터 통신
-		for (auto iter : client)
+		for (auto iter : _roomMgr->GetRooms()) // Room 순회
 		{
-			Session* se = iter;
-			if (se == nullptr) continue;
-			if (se->Run(rset, wset) == FALSE) break;
+			Room* room = iter.second;
+			if (room == nullptr) continue;
+
+			for (auto it : room->GetMembers()) // Room 유저 순회
+			{
+				Session* se = it;
+				if (se == nullptr) continue;
+				if (se->Run(rset, wset) == FALSE) break;
+			}
 		}
 	}
-
 	return TRUE;
 }
 
 void ServerContext::Close()
 {
-	set<Session*>& client = sessMgr_->GetClients();
+	set<Session*>& client = _sessMgr->GetClients();
 	for (auto c : client)
 	{
 		delete c;

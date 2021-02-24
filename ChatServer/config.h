@@ -4,21 +4,20 @@ using namespace std;
 
 #define SERVERPORT 9000
 #define BUFSIZE    512
+#define ROOM_USER_MAX 100
 
 struct PlayerInfo {
 	int code;
 	string name;
 };
 
-//enum class Result {
-//	None,
-//	SOCK_BIND_ERROR,
-//	LISTEN_ERROR,
-//	TCP_LISTEN_INVALID_SOCK_ERROR,
-//	ACCEPT_ID_SOCKET,
-//	SEND_ERROR,
-//	RECV_ERROR
-//};
+struct RoomInfo {
+	int _roomCode;
+	int _memberNumMax;
+	string _roomName = "unknown";
+
+	bool _isLobby = false;
+};
 
 enum class IPType {
 	IPv4,

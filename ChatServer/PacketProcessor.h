@@ -1,5 +1,6 @@
 #pragma once
-
+#include "RoomManager.h"
+#include "SessionManager.h"
 // 텔넷 클라이언트로 부터
 // 그냥 채팅만 받으면 그대로 출력
 
@@ -7,3 +8,17 @@
 // H -> 도움말함수
 // LOGIN + 채팅 -> 로비방 입장 함수
 // ENTER + 방번호 -> 방입장 함수
+
+class PacketProceessor {
+
+
+public:
+	PacketProceessor();
+
+	void GotLogin(Session* sess, const char* data);
+
+
+private:
+	RoomManager*	_roomMgr;
+	SessionManager* _sessMgr;
+};

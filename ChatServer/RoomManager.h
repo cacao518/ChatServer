@@ -8,19 +8,23 @@
 #include "config.h"
 
 class Room;
+
 class RoomManager {
 	static RoomManager* instance;
 public:
 	static RoomManager* GetInstance();
 
 public:
-	BOOL AddRoom(SOCKET sock);
-	void RemoveRoom(Room* room);
-
+	// 인자 O -> 유저가 만든 방 생성
+	// 인자 X -> 로비 생성
+	BOOL	AddRoom(Session* master, int max, string name);
+	void	RemoveRoom(Room* room);
 
 public:
-	unordered_map<Room*, int>& GetRooms() { return rooms_; };
+	unordered_map<int, Room*>& GetRooms() { return _rooms; }
+	int GetNewCode() { return _roomCode++; }
 
 private:
-	unordered_map<Room*, int> rooms_;
+	int _roomCode = 0;
+	unordered_map<int, Room*> _rooms;
 };

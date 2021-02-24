@@ -3,8 +3,8 @@
 
 Session::Session(TcpSocket socket)
 {
-	socket_ = socket;
-	socket_.SetSession(this);
+	_socket = socket;
+	_socket.SetSession(this);
 }
 
 Session::~Session()
@@ -66,4 +66,10 @@ BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 	}
 
 	return TRUE;
+}
+
+void Session::SetPlayerInfo(PlayerInfo info)
+{
+	_info.code = info.code;
+	_info.name = info.name;
 }

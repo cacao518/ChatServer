@@ -14,33 +14,34 @@ SessionManager* SessionManager::GetInstance()
 
 }
 
-BOOL SessionManager::AddSession(SOCKET sock)
+Session* SessionManager::AddSession(SOCKET sock)
 {
-	if (clients_.size() >= FD_SETSIZE) {
+	if (_clients.size() >= FD_SETSIZE) {
 		printf("[오류] 소켓 정보를 추가할 수 없습니다!\n");
-		return FALSE;
+		return nullptr;
 	}
 
 	Session* ptr = new Session( TcpSocket(SocketType::TCP, IPType::IPv4) );
 
 	if (ptr == NULL) {
 		printf("[오류] 메모리가 부족합니다!\n");
-		return FALSE;
+		return nullptr;
 	}
 
 	ptr->GetTcpSock().SetSocket(sock);
 	ptr->GetTcpSock().SetRecvBytes(0);
-	clients_.insert(ptr);
+	_clients.insert(ptr);
 
-	return TRUE;
+	// 방금 추가한 세션 반환
+	return ptr;
 }
 
 
 void SessionManager::RemoveSession(Session* client)
 {
-	if (clients_.empty()) return;
+	if (_clients.empty()) return;
 
-	Session* ptr = *(clients_.find(client));
+	Session* ptr = *(_clients.find(client));
 	if (ptr == nullptr) return;
 
 	// 클라이언트 정보 얻기
@@ -51,6 +52,6 @@ void SessionManager::RemoveSession(Session* client)
 		inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
 	closesocket(ptr->GetSock());
-	clients_.erase(client);
+	_clients.erase(client);
 	delete ptr;
 }

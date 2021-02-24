@@ -1,22 +1,24 @@
 #pragma once
-#include <unordered_map>
+#include <set>
 #include "Session.h"
 #include "config.h"
 
 class Room {
 
 public:
-	Room();
+	Room(int roomCode);
+	Room(Session * master, int roomCode, int max, string name);
+
 	void EnterRoom(Session* sess);
-	void ExitRoom(Session* sess);
+	void LeaveRoom(Session* sess);
 	void SendData(Session* sess, const char* data);
 	void SendAllToRoomMembers(const char* data);
 
-	int getNewCode() { return codeAccumulator++; }
+	RoomInfo		GetRoomInfo() { return _info; }
+	set<Session*>&	GetMembers() { return _members; };
 
 private:
-	int codeAccumulator = 0;
-	string roomName_;
-	int memberNumMax_;
-	unordered_map<Session*, PlayerInfo> members_;
+	RoomInfo		_info;
+	Session*		_master;
+	set<Session*>	_members;
 };

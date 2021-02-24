@@ -4,35 +4,35 @@
 
 EndPoint::EndPoint()
 {
-	ZeroMemory(&serveraddr_, sizeof(serveraddr_));
+	ZeroMemory(&_serveraddr, sizeof(_serveraddr));
 }
 
 EndPoint::EndPoint(const char * ip, int port, IPType type)
 {
-	ZeroMemory(&serveraddr_, sizeof(serveraddr_));
+	ZeroMemory(&_serveraddr, sizeof(_serveraddr));
 
-	IpType_ = type;
+	_IpType = type;
 	if (type == IPType::IPv4) {
-		auto pAddr = (SOCKADDR_IN*)&serveraddr_;
+		auto pAddr = (SOCKADDR_IN*)&_serveraddr;
 
 		pAddr->sin_family = AF_INET;
 		pAddr->sin_addr.s_addr = htonl(INADDR_ANY);// inet_addr(ip);
 		pAddr->sin_port = htons(port);
 	}
 	else {
-		serveraddr_.sin6_family = AF_INET6;
-		int len = sizeof(serveraddr_);
+		_serveraddr.sin6_family = AF_INET6;
+		int len = sizeof(_serveraddr);
 		WSAStringToAddressA((LPSTR)ip, AF_INET6, NULL,
-			(SOCKADDR*)&serveraddr_, &len);
-		serveraddr_.sin6_port = htons(port);
+			(SOCKADDR*)&_serveraddr, &len);
+		_serveraddr.sin6_port = htons(port);
 	}
 }
 
 EndPoint::EndPoint(int ip, int port)
 {
-	ZeroMemory(&serveraddr_, sizeof(serveraddr_));
-	IpType_ = IPType::IPv4;
-	auto pAddr = (SOCKADDR_IN*)&serveraddr_;
+	ZeroMemory(&_serveraddr, sizeof(_serveraddr));
+	_IpType = IPType::IPv4;
+	auto pAddr = (SOCKADDR_IN*)&_serveraddr;
 
 	pAddr->sin_family = AF_INET;
 	pAddr->sin_addr.s_addr = htonl(ip);
@@ -41,29 +41,29 @@ EndPoint::EndPoint(int ip, int port)
 
 int EndPoint::GetPort()
 {
-	if (IpType_ == IPType::IPv4) {
-		auto pAddr = (SOCKADDR_IN*)&serveraddr_;
+	if (_IpType == IPType::IPv4) {
+		auto pAddr = (SOCKADDR_IN*)&_serveraddr;
 
 		return ntohs(pAddr->sin_port);
 	}
 	else {
-		return ntohs(serveraddr_.sin6_port);
+		return ntohs(_serveraddr.sin6_port);
 
 	}
 }
 
 string EndPoint::GetAddrStr()
 {
-	if (IpType_ == IPType::IPv4) 
+	if (_IpType == IPType::IPv4) 
 	{
-		auto pAddr = (SOCKADDR_IN*)&serveraddr_;
+		auto pAddr = (SOCKADDR_IN*)&_serveraddr;
 		return std::string(inet_ntoa(pAddr->sin_addr));
 	}
 	else 
 	{
 		char ipaddr[50];
 		DWORD ipaddrlen = sizeof(ipaddr);
-		WSAAddressToStringA((SOCKADDR*)&serveraddr_, sizeof(serveraddr_), NULL, ipaddr, &ipaddrlen);
+		WSAAddressToStringA((SOCKADDR*)&_serveraddr, sizeof(_serveraddr), NULL, ipaddr, &ipaddrlen);
 
 		return std::string(ipaddr);
 	}
@@ -71,7 +71,7 @@ string EndPoint::GetAddrStr()
 
 int EndPoint::GetAddrSize() 
 {
-	if (IpType_ == IPType::IPv4)
+	if (_IpType == IPType::IPv4)
 		return sizeof(SOCKADDR_IN);
 	else 
 		return sizeof(SOCKADDR_IN6);
@@ -79,10 +79,10 @@ int EndPoint::GetAddrSize()
 
 void EndPoint::SetIPTypeFromAddrSize(int Addrsize) {
 	if (Addrsize == sizeof(SOCKADDR_IN)) {
-		IpType_ = IPType::IPv4;
+		_IpType = IPType::IPv4;
 	}
 	else {
-		IpType_ = IPType::IPv6;
+		_IpType = IPType::IPv6;
 	}
 }
 

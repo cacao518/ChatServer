@@ -22,13 +22,13 @@ public:
 	string			GetAddrStr();
 	int				GetAddrSize();
 
-	SOCKADDR*		GetAddr() { return (SOCKADDR*)&serveraddr_; }
-	IPType			GetIpType() { return IpType_; };
+	SOCKADDR*		GetAddr() { return (SOCKADDR*)&_serveraddr; }
+	IPType			GetIpType() { return _IpType; };
 
 	void			SetIPTypeFromAddrSize(int Addrsize);
 
 private:
-	SOCKADDR_IN6 serveraddr_;
-	IPType IpType_;
+	SOCKADDR_IN6	_serveraddr;
+	IPType			_IpType;
 
 };

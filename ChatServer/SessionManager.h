@@ -8,19 +8,21 @@
 #include "config.h"
 
 class Session;
+
 class SessionManager {
 	static SessionManager* instance;
 public:
 	static SessionManager* GetInstance();
 
 public:
-	BOOL AddSession(SOCKET sock);
-	void RemoveSession(Session* client);
-
+	Session*		AddSession(SOCKET sock);
+	void			RemoveSession(Session* client);
 
 public:
-	set<Session*>& GetClients() { return clients_; };
+	set<Session*>&	GetClients() { return _clients; };
+	int				GetNewCode() { return _code++; }
 
 private:
-	set<Session*> clients_;
+	int				_code = 0;
+	set<Session*>	_clients;
 };

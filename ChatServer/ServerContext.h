@@ -1,6 +1,7 @@
 #pragma once
 #include "TcpSocket.h"
 #include "SessionManager.h"
+#include "RoomManager.h"
 #include "Room.h"
 #include <set>
 
@@ -16,7 +17,9 @@ public:
 	void Close();
 
 private:
-	TcpSocket listenSock_;
-	SessionManager* sessMgr_;
+	TcpSocket _listenSock;
+
+	SessionManager* _sessMgr;
+	RoomManager* _roomMgr;
 
 };
