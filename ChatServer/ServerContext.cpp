@@ -89,18 +89,6 @@ BOOL ServerContext::Run()
 			if (se == nullptr) continue;
 			if (se->Run(rset, wset) == FALSE) break;
 		}
-		//for (auto iter : _roomMgr->GetRooms()) // Room 순회
-		//{
-		//	Room* room = iter.second;
-		//	if (room == nullptr) continue;
-
-		//	for (auto it : room->GetMembers()) // Room 유저 순회
-		//	{
-		//		Session* se = it;
-		//		if (se == nullptr) continue;
-		//		if (se->Run(rset, wset) == FALSE) break;
-		//	}
-		//}
 	}
 	return TRUE;
 }

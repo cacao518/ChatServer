@@ -56,6 +56,7 @@ BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
 	
 	// 명령어에 걸리지 않는다면 그냥 일반 채팅으로 뿌리기
 	Chat(sess);
+
 	return TRUE;
 }
 
@@ -93,7 +94,6 @@ void PacketProceessor::Chat(Session * sess)
 	addrlen = sizeof(clientaddr);
 	getpeername(sess->GetSock(), (SOCKADDR*)&clientaddr, &addrlen);
 	printf("[TCP/%s:%d] %s", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port), retBuf.c_str());
-
 
 	// 방에 있는 클라들에게 보내기
 	retBuf.append(">");

@@ -26,8 +26,7 @@ void Room::EnterRoom(Session * sess)
 	
 	_members.insert(sess);
 
-	// 아이디 출력추가하기
-	string message = sess->GetPlayerInfo().name + "님이 " + "채팅 로비에 입장하셨습니다.\r\n\n>\0";
+	string message = "* " + sess->GetPlayerInfo().name + "님이 " + " 입장하셨습니다.\r\n\n>\0";
 	SendAllToRoomMembers(message.c_str());
 }
 
@@ -38,7 +37,8 @@ void Room::LeaveRoom(Session * sess)
 	
 	_members.erase(sess);
 
-	// SendAllToRoomMembers 나갔다고 ㄱ
+	string message = "* " + sess->GetPlayerInfo().name + "님이 " + " 나갔습니다.\r\n\n>\0";
+	SendAllToRoomMembers(message.c_str());
 }
 
 void Room::SendData(Session * sess, const char * data)
