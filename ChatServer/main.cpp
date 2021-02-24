@@ -8,13 +8,11 @@
 
 #include "ServerContext.h"
 
-int main(int argc, char* argv[])
+int main()
 {
 	ServerContext sc;
 
-	if (sc.Init(SERVERPORT) == FALSE)
-		return -1;
-
+	sc.Init(SERVERPORT);
 	sc.Run();
 	
 	return 0;

@@ -16,6 +16,7 @@ public:
 
 	////////////////////////////////////
 
+	bool		GetIsLogin() { return _isLogin; };
 	PlayerInfo	GetPlayerInfo() { return _info; }
 	Room*		GetParent() { return _parent; }
 	void		SetPlayerInfo(PlayerInfo info);
@@ -25,4 +26,5 @@ private:
 	TcpSocket	_socket;
 	PlayerInfo	_info;
 	Room*		_parent;
+	bool		_isLogin = false;
 };

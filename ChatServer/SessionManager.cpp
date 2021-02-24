@@ -58,7 +58,13 @@ void SessionManager::RemoveSession(Session* client)
 	printf("[TCP 서버] 클라이언트 종료: IP 주소=%s, 포트 번호=%d\n",
 		inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
+	// Room에 있는 member에서 제거하고, 방에 있는 사람들에게 알리기
+	ptr->GetParent()->LeaveRoom(client);
+
+	// 소켓 닫기
 	closesocket(ptr->GetSock());
+	
+	// 세션 set 에서 제거
 	_clients.erase(client);
 	delete ptr;
 }

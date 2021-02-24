@@ -43,8 +43,8 @@ BOOL ServerContext::Accept(TcpSocket& client_sock, FD_SET& rset)
 			// 소켓을 세션으로 추가
 			_sessMgr->AddSession(client_sock.GetSocket());
 
-			char ss[50] = "* 명령어로 로그인을 해주세요. (LOGIN 아이디)\r\n\n>\0";
-			client_sock.Send(ss, strlen(ss));
+			string message = "		* 명령어로 로그인을 해주세요. (LOGIN 아이디)\r\n\n입력> \0";
+			client_sock.Send(message.c_str(), strlen(message.c_str()));
 		}
 	}
 	return TRUE;
@@ -79,11 +79,11 @@ BOOL ServerContext::Run()
 		if (select(0, &rset, &wset, NULL, NULL) == SOCKET_ERROR) 
 			ErrorUtil::err_quit("select()");
 
-		// 소켓 셋 검사(1): 클라이언트 접속 수용
+		// (1) 세션(클라이언트) 접속 수용
 		Accept(client_socket, rset);
 
-		// 소켓 셋 검사(2): 데이터 통신
-		for (auto it : _sessMgr->GetClients())
+		// (2) 모든 세션들에 대해서 FD_SET에 해당 소켓이 들어있다면 받기/보내기 실행
+		for (auto it : clients)
 		{
 			Session* se = it;
 			if (se == nullptr) continue;

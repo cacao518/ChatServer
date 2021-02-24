@@ -26,10 +26,11 @@ void Room::EnterRoom(Session * sess)
 	
 	_members.insert(sess);
 
-	string message = "* " + sess->GetPlayerInfo().name + "님이 " + " 입장하셨습니다.\r\n\n>\0";
+	string message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 " + "입장하셨습니다.\r\n\n입력> \0";
 	SendAllToRoomMembers(message.c_str());
 }
 
+// 나가는 세션을 member에서 제거하고, 방에 있는 사람들에게 알리기
 void Room::LeaveRoom(Session * sess)
 {
 	if (sess == nullptr) return;
@@ -37,10 +38,11 @@ void Room::LeaveRoom(Session * sess)
 	
 	_members.erase(sess);
 
-	string message = "* " + sess->GetPlayerInfo().name + "님이 " + " 나갔습니다.\r\n\n>\0";
+	string message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 " + "나갔습니다.\r\n\n입력> \0";
 	SendAllToRoomMembers(message.c_str());
 }
 
+// 방에 있는 사람들에게 채팅메세지 보내기
 void Room::SendData(Session * sess, const char * data)
 {
 	for (auto client : _members)
