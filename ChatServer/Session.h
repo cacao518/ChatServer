@@ -19,6 +19,7 @@ public:
 	bool		GetIsLogin() { return _isLogin; };
 	PlayerInfo	GetPlayerInfo() { return _info; }
 	Room*		GetParent() { return _parent; }
+	void		SetIsLogin(bool isLogin) { _isLogin = isLogin; };
 	void		SetPlayerInfo(PlayerInfo info);
 	void		SetParent(Room* parent) { _parent = parent; }
 

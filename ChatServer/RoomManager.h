@@ -17,7 +17,7 @@ public:
 public:
 	// 牢磊 O -> 蜡历啊 父电 规 积己
 	// 牢磊 X -> 肺厚 积己
-	BOOL	AddRoom(Session* master, int max, string name);			/// 规 积己
+	Room*	AddRoom(Session* master, int max, string name);			/// 规 积己
 	void	RemoveRoom(Room* room);									/// 规 力芭
 
 public:

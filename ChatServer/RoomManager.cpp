@@ -12,7 +12,7 @@ RoomManager* RoomManager::GetInstance()
 
 }
 
-BOOL RoomManager::AddRoom(Session* master, int max, string name)
+Room* RoomManager::AddRoom(Session* master, int max, string name)
 {
 	int n = GetNewCode();
 
@@ -21,7 +21,7 @@ BOOL RoomManager::AddRoom(Session* master, int max, string name)
 	else
 		_rooms[n] = new Room(master, n, max, name); //유저가 만든 방
 
-	return 0;
+	return _rooms[n];
 }
 
 void RoomManager::RemoveRoom(Room * room)

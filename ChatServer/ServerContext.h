@@ -20,9 +20,9 @@ public:
 	void Close();
 
 private:
-	TcpSocket _listenSock;
+	TcpSocket		_listenSock;
 
 	SessionManager* _sessMgr;
-	RoomManager* _roomMgr;
+	RoomManager*	_roomMgr;
 
 };

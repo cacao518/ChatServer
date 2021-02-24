@@ -30,6 +30,15 @@ PacketProceessor::PacketProceessor()
 	_command.push_back("/join ");
 
 	_packetHandleMap[PacketKind::Login] = [this](Session* sess, const char* data) { GotLogin(sess, data); };
+	_packetHandleMap[PacketKind::Help] = [this](Session* sess, const char* data) { GotHelp(sess); };
+	_packetHandleMap[PacketKind::Exit] = [this](Session* sess, const char* data) { GotExit(sess); };
+	_packetHandleMap[PacketKind::ShowRoom] = [this](Session* sess, const char* data) { GotShowRoom(sess); };
+	_packetHandleMap[PacketKind::ShowUser] = [this](Session* sess, const char* data) { GotShowUser(sess); };
+	_packetHandleMap[PacketKind::ShowRoomInfo] = [this](Session* sess, const char* data) { GotShowRoomInfo(sess, data); };
+	_packetHandleMap[PacketKind::ShowUserInfo] = [this](Session* sess, const char* data) { GotShowUserInfo(sess, data); };
+	_packetHandleMap[PacketKind::Whisper] = [this](Session* sess, const char* data) { GotWhisper(sess, data); };
+	_packetHandleMap[PacketKind::JoinRoom] = [this](Session* sess, const char* data) { GotJoinRoom(sess, data); };
+	_packetHandleMap[PacketKind::MakeRoom] = [this](Session* sess, const char* data) { GotMakeRoom(sess, data); };
 }
 
 BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
@@ -40,7 +49,7 @@ BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
 	string str(data);
 
 	// 클라로 부터 받은 data가 명령어에 걸리는지 체크
-	for (int i = 0; i < (int)PacketKind::End - 1; i++)
+	for (int i = 0; i < (int)PacketKind::End; i++)
 	{
 		if (str.find(_command[ i ] ) == 0) // 받은 문자 맨앞에 커맨드가 있을 경우
 		{
@@ -64,9 +73,64 @@ BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
 // 로그인 명령어(패킷) 받았을 때 실행하는 함수
 void PacketProceessor::GotLogin(Session* sess, const char* data)
 {
+	if (sess->GetIsLogin() == true) return;
+
 	sess->SetPlayerInfo( PlayerInfo{ _sessMgr->GetNewCode(), data } );		// 로그인한 세션 정보 셋팅
-	sess->SetParent(_roomMgr->GetRooms()[0]);		// 세션 부모(입장한 방) 셋팅
-	_roomMgr->GetRooms()[0]->EnterRoom(sess);		// 로비방 입장 (로비 인덱스 = 0)
+	sess->SetParent(_roomMgr->GetRooms()[0]);								// 세션 부모(입장한 방) 셋팅
+	_roomMgr->GetRooms()[0]->EnterRoom(sess);								// 로비방 입장 (로비 인덱스 = 0)
+
+	sess->SetIsLogin(true);
+}
+
+void PacketProceessor::GotHelp(Session * sess)
+{
+}
+
+void PacketProceessor::GotExit(Session * sess)
+{
+}
+
+void PacketProceessor::GotShowRoom(Session * sess)
+{
+}
+
+void PacketProceessor::GotShowUser(Session * sess)
+{
+}
+
+void PacketProceessor::GotShowRoomInfo(Session * sess, const char * data)
+{
+}
+
+void PacketProceessor::GotShowUserInfo(Session * sess, const char * data)
+{
+}
+
+void PacketProceessor::GotWhisper(Session * sess, const char * data)
+{
+}
+
+void PacketProceessor::GotMakeRoom(Session * sess, const char * data)
+{
+	string name(data);
+	Room* room = _roomMgr->AddRoom(sess, ROOM_USER_MAX, name); // 방만들기
+	if (room == nullptr) return;
+	sess->GetParent()->LeaveRoom(sess);						// 이전 방 나가기
+	sess->SetParent(room);									// 새로운 방으로 설정
+	room->EnterRoom(sess);									// 새로운 방 입장
+}
+
+void PacketProceessor::GotJoinRoom(Session * sess, const char * data)
+{
+	// 방 검색
+	auto roomIter = _roomMgr->GetRooms().find(atoi(data));
+	auto room = (*roomIter).second;
+	if (roomIter == _roomMgr->GetRooms().end())
+		return;
+
+	sess->GetParent()->LeaveRoom(sess);						// 이전 방 나가기
+	sess->SetParent(room);									// 새로운 방으로 설정
+	(*roomIter).second->EnterRoom(sess);					// 새로운 방 입장
 }
 
 
@@ -88,6 +152,7 @@ void PacketProceessor::Chat(Session * sess)
 	// retBuf 서버에 먼저 출력
 	addrlen = sizeof(clientaddr);
 	getpeername(sess->GetSock(), (SOCKADDR*)&clientaddr, &addrlen);
+	printf("[%s : %d]", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 	printf("%s", retBuf.c_str());
 
 	// 방에 있는 클라들에게 보내기
