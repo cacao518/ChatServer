@@ -14,7 +14,7 @@ Session::~Session()
 BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 {
 	SessionManager* sessMgr = SessionManager::GetInstance();
-	set<Session*>& client = sessMgr->GetClients();
+	set<Session*>& clients = sessMgr->GetClients();
 
 	int addrlen;
 	SOCKADDR_IN clientaddr;
@@ -30,12 +30,13 @@ BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 	{
 		// 데이터 보내기
 		int idx = 0;
+		// 범위 체크 ㄱㄱ
 		retBuf[idx++] = '\r';
 		retBuf[idx++] = '\n';
 
-		for (auto c : GetTcpSock().GetTotalBuf())
+		for (auto chr : GetTcpSock().GetTotalBuf())
 		{
-			retBuf[idx++] = c;
+			retBuf[idx++] = chr;
 		}
 
 		retBuf[idx] = '\0';
@@ -49,11 +50,11 @@ BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 		// 클라들에게 보내기
 		retBuf[idx++] = '>';
 		retBuf[idx] = '\0';
-		for (auto c : client)
+		for (auto client : clients)
 		{
 			// 채팅을 보낸 클라이언트는 제외
-			if (c->GetSock() == GetSock()) continue;
-			if (c->GetTcpSock().Send(retBuf, strlen(retBuf)) == FALSE) return FALSE;
+			if (client->GetSock() == GetSock()) continue;
+			if (client->GetTcpSock().Send(retBuf, strlen(retBuf)) == FALSE) return FALSE;
 		}
 
 		// 채팅을 보낸 클라이언트 > 커서 다시 표시

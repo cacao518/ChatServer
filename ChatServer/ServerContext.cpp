@@ -1,12 +1,15 @@
 #include "ServerContext.h"
 #include "Session.h"
 #include "SessionManager.h"
+#include "RoomManager.h"
+#include "PacketProcessor.h"
 #include <set>
 
 ServerContext::ServerContext()
-	:_listenSock(SocketType::TCP, IPType::IPv4)//, _sessMgr(sessMgr)
+	:_listenSock(SocketType::TCP, IPType::IPv4) 
 {
 	_sessMgr = SessionManager::GetInstance();
+	_roomMgr = RoomManager::GetInstance();
 }
 
 ServerContext::~ServerContext()
@@ -49,7 +52,7 @@ BOOL ServerContext::Accept(TcpSocket& client_sock, FD_SET& rset)
 
 BOOL ServerContext::Run()
 {
-	set<Session*>& client = _sessMgr->GetClients();
+	set<Session*>& clients = _sessMgr->GetClients();
 	_roomMgr->AddRoom(nullptr, ROOM_USER_MAX, "Lobby"); // 로비 생성
 
 	// 데이터 통신에 사용할 변수
@@ -63,7 +66,7 @@ BOOL ServerContext::Run()
 		FD_ZERO(&wset);
 		FD_SET(_listenSock.GetSocket(), &rset);
 
-		for (auto it : client)
+		for (auto it : clients)
 		{
 			// 엔터를 쳤을경우 쓰기 셋에 추가
 			if (it->GetTcpSock().GetBuf() == '\n')
@@ -98,12 +101,12 @@ BOOL ServerContext::Run()
 
 void ServerContext::Close()
 {
-	set<Session*>& client = _sessMgr->GetClients();
-	for (auto c : client)
+	set<Session*>& clients = _sessMgr->GetClients();
+	for (auto client : clients)
 	{
-		delete c;
+		delete client;
 	}
 
-	client.clear();
+	clients.clear();
 	WSACleanup();
 }

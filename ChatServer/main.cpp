@@ -6,12 +6,7 @@
 #include <vector>
 #include <set>
 
-#include "EndPoint.h"
-#include "TcpSocket.h"
-#include "config.h"
 #include "ServerContext.h"
-#include "Session.h"
-#include "SessionManager.h"
 
 int main(int argc, char* argv[])
 {

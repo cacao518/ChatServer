@@ -30,15 +30,15 @@ public:
 	SOCKET&			GetSocket() { return _sock; }
 	char&			GetBuf() { return _buf; }
 	vector<char>&	GetTotalBuf() { return _totalBuf; }
-	int				GetRecvBytes() { return _recvbytes; }
-	int				GetSocketType() { return _socketType; }
+	int				GetRecvBytes() const { return _recvbytes; }
+	int				GetSocketType() const { return _socketType; }
 
 	string			GetIPAddress(); // 아이피 주소(숫자)를 반환
 	int				GetPort(); // 포트번호(숫자)를 반환
 
-	void			SetBuf(char buf) { this->_buf = buf; }
-	void			SetSocket(SOCKET sock) { this->_sock = sock; }
-	void			SetRecvBytes(int recvbytes) { this->_recvbytes = recvbytes; }
+	void			SetBuf(const char buf) { this->_buf = buf; }
+	void			SetSocket(const SOCKET sock) { this->_sock = sock; }
+	void			SetRecvBytes(const int recvbytes) { this->_recvbytes = recvbytes; }
 	void			SetSession(Session* sess) { this->_parent = sess; };
 
 private:

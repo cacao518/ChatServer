@@ -1,9 +1,12 @@
 #pragma once
 #include "TcpSocket.h"
 #include "SessionManager.h"
+#include "PacketProcessor.h"
 #include "RoomManager.h"
 #include "Room.h"
 #include <set>
+
+class PacketProcessor;
 
 class ServerContext {
 

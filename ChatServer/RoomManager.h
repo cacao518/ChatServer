@@ -17,14 +17,14 @@ public:
 public:
 	// 牢磊 O -> 蜡历啊 父电 规 积己
 	// 牢磊 X -> 肺厚 积己
-	BOOL	AddRoom(Session* master, int max, string name);
-	void	RemoveRoom(Room* room);
+	BOOL	AddRoom(Session* master, int max, string name);			/// 规 积己
+	void	RemoveRoom(Room* room);									/// 规 力芭
 
 public:
 	unordered_map<int, Room*>& GetRooms() { return _rooms; }
 	int GetNewCode() { return _roomCode++; }
 
 private:
-	int _roomCode = 0;
-	unordered_map<int, Room*> _rooms;
+	int _roomCode = 0;												/// 规 绊蜡锅龋
+	unordered_map<int, Room*> _rooms;								/// 葛电 规
 };

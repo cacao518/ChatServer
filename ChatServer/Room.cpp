@@ -28,7 +28,7 @@ void Room::EnterRoom(Session * sess)
 
 	// 아이디 출력추가하기
 	char ss[50] = "채팅 로비에 입장하셨습니다.\r\n\n>\0";
-	sess->GetSock.Send(ss, strlen(ss));
+	sess->GetTcpSock().Send(ss, strlen(ss));
 
 	// SendAllToRoomMembers 입장했다고 ㄱ
 }

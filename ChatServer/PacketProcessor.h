@@ -1,24 +1,27 @@
 #pragma once
 #include "RoomManager.h"
 #include "SessionManager.h"
-// 텔넷 클라이언트로 부터
-// 그냥 채팅만 받으면 그대로 출력
-
-// 명령어 + 채팅 받으면 패킷 처럼 구분하는 식으로 함수 호출 ㄱㄱ
-// H -> 도움말함수
-// LOGIN + 채팅 -> 로비방 입장 함수
-// ENTER + 방번호 -> 방입장 함수
+#include <functional>
 
 class PacketProceessor {
 
-
+	static PacketProceessor* instance;
 public:
+	static PacketProceessor* GetInstance();
+
 	PacketProceessor();
+
+	BOOL PacketProcess(Session* sess, const char* data);
 
 	void GotLogin(Session* sess, const char* data);
 
+public:
+	using PacketHandler = std::function<void(Session*, const char* data)>;
+	unordered_map<PacketKind, PacketHandler> _packetHandleMap;
 
 private:
+	vector<string> _command;
+
 	RoomManager*	_roomMgr;
 	SessionManager* _sessMgr;
 };

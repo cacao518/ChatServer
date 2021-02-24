@@ -14,6 +14,13 @@ SessionManager* SessionManager::GetInstance()
 
 }
 
+///////////////////////////////////
+/// @brief ¹«½¼ ÇÔ¼ö ¤·¤¤¤±¤·¤±¤¤
+///
+///	@param	sock	¹¹ÇÏ´Â º¯¼ö
+///	@param	sock	¹¹ÇÏ´Â º¯¼ö
+///	@param	sock	¹¹ÇÏ´Â º¯¼ö
+//////////////////////////////////
 Session* SessionManager::AddSession(SOCKET sock)
 {
 	if (_clients.size() >= FD_SETSIZE) {

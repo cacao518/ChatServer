@@ -1,7 +1,8 @@
 #pragma once
-
 #include "TcpSocket.h"
 #include "Room.h"
+
+class Room;
 
 class Session {
 
@@ -15,10 +16,10 @@ public:
 
 	////////////////////////////////////
 
-	PlayerInfo	GetPlayerInfo() { return _info; };
-	Room*		GetParent() { return _parent; };
+	PlayerInfo	GetPlayerInfo() { return _info; }
+	Room*		GetParent() { return _parent; }
 	void		SetPlayerInfo(PlayerInfo info);
-	void		SetParent(Room* parent) { _parent = parent; };
+	void		SetParent(Room* parent) { _parent = parent; }
 
 private:
 	TcpSocket	_socket;

@@ -10,19 +10,19 @@
 class Session;
 
 class SessionManager {
-	static SessionManager* instance;
+	static SessionManager* instance;		
 public:
 	static SessionManager* GetInstance();
 
 public:
-	Session*		AddSession(SOCKET sock);
-	void			RemoveSession(Session* client);
+	Session*		AddSession(SOCKET sock); 			/// 세션(클라이언트) 추가
+	void			RemoveSession(Session* client);		/// 세션(클라이언트) 제거
 
 public:
 	set<Session*>&	GetClients() { return _clients; };
 	int				GetNewCode() { return _code++; }
 
 private:
-	int				_code = 0;
-	set<Session*>	_clients;
+	int				_code = 0;		/// 세션 고유 번호
+	set<Session*>	_clients;		/// 세션(클라이언트) set
 };
