@@ -13,6 +13,7 @@ PacketProceessor * PacketProceessor::GetInstance()
 	return instance;
 }
 
+/// 패킷에 맞는 핸들러 함수들을 등록해둔다.
 PacketProceessor::PacketProceessor()
 {
 	_roomMgr = RoomManager::GetInstance();
@@ -30,6 +31,7 @@ PacketProceessor::PacketProceessor()
 	_command.push_back("/make ");
 	_command.push_back("/join ");
 
+	// 리시브 핸들러 함수 등록
 	_packetHandleMap[PacketKind::Login] = [this](Session* sess, const char* data) { GotLogin(sess, data); };
 	_packetHandleMap[PacketKind::Help] = [this](Session* sess, const char* data) { GotHelp(sess); };
 	_packetHandleMap[PacketKind::Exit] = [this](Session* sess, const char* data) { GotExit(sess); };
@@ -42,6 +44,7 @@ PacketProceessor::PacketProceessor()
 	_packetHandleMap[PacketKind::MakeRoom] = [this](Session* sess, const char* data) { GotMakeRoom(sess, data); };
 }
 
+/// 세션이 리시브를 하고 난 다음에 이 함수를 실행하여 핸들러를 실행한다.
 BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
 {
 	if (sess == nullptr) return FALSE;
@@ -89,6 +92,7 @@ void PacketProceessor::GotLogin(Session* sess, const char* data)
 	sess->SetIsLogin(true);
 }
 
+/// 도움말 명령어(패킷) 받았을 때 실행하는 함수
 void PacketProceessor::GotHelp(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
@@ -111,6 +115,7 @@ void PacketProceessor::GotHelp(Session * sess)
 	sess->GetTcpSock().Send(message.c_str());
 }
 
+/// 나가기 명령어(패킷) 받았을 때 실행하는 함수
 void PacketProceessor::GotExit(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
@@ -134,6 +139,7 @@ void PacketProceessor::GotExit(Session * sess)
 	}
 }
 
+/// 모든 방 출력 명령어(패킷) 받았을 때 실행하는 함수
 void PacketProceessor::GotShowRoom(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
@@ -142,6 +148,7 @@ void PacketProceessor::GotShowRoom(Session * sess)
 	_roomMgr->ShowRoomList(sess);
 }
 
+///모든 유저 보기 명령어(패킷) 받았을 때 실행하는 함수
 void PacketProceessor::GotShowUser(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
@@ -150,6 +157,7 @@ void PacketProceessor::GotShowUser(Session * sess)
 	_sessMgr->ShowUserList(sess);
 }
 
+///방 정보 보기 명령어(패킷) 받았을 때 실행하는 함수
 void PacketProceessor::GotShowRoomInfo(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
@@ -158,6 +166,7 @@ void PacketProceessor::GotShowRoomInfo(Session * sess, const char * data)
 	_roomMgr->ShowRoomInfo(sess, (UINT)atoi(data));
 }
 
+///유저 정보 보기 명령어(패킷) 받았을 때 실행하는 함수
 void PacketProceessor::GotShowUserInfo(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
@@ -166,12 +175,48 @@ void PacketProceessor::GotShowUserInfo(Session * sess, const char * data)
 	_sessMgr->ShowUserInfo(sess, (UINT)atoi(data));
 }
 
+///귓속말 명령어(패킷) 받았을 때 실행하는 함수
 void PacketProceessor::GotWhisper(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
 	if (sess->GetIsLogin() == false) return;
+
+	string recvClientName(data);
+	string sendData(data);
+	int range = sendData.find(" ");
+	// (1) 받은 문자가 맨앞보다 뒤에 위치한다면...
+	if (range > 0)
+	{
+		// (2) 아이디 + 내용 
+		recvClientName = recvClientName.substr(0, range);
+		sendData = sendData.substr(range + 1, sendData.size());
+	}
+	else
+		return;
+
+	if (recvClientName == sess->GetPlayerInfo().name) return; // 나한테 귓말 날리는건 안됨.
+
+	// (3) 클라이언트 찾아서 귓말 날리기
+	bool isFindSuccess = false;
+	for (auto client : _sessMgr->GetClients())
+	{
+		if (client->GetPlayerInfo().name == recvClientName)
+		{
+			if (client->GetIsLogin() == false) return;
+			string finalSendData = "\r\n [귓속말] [" + recvClientName + "] " + sendData + "\r\n\r\n입력> ";
+			client->GetTcpSock().Send(finalSendData.c_str());
+			isFindSuccess = true;
+			break;
+		}
+	}
+	if (isFindSuccess == false) return;			// 못찾으면 리턴.
+
+	string message = "=========================================================\r\n		귓속말을 보냈습니다.\r\n=========================================================\r\n";
+	message.append("\r\n입력> ");
+	sess->GetTcpSock().Send(message.c_str());
 }
 
+/// 방만들기 명령어(패킷) 받았을 때 실행하는 함수
 void PacketProceessor::GotMakeRoom(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
@@ -189,6 +234,7 @@ void PacketProceessor::GotMakeRoom(Session * sess, const char * data)
 	room->EnterRoom(sess);									// 새로운 방 입장
 }
 
+///방 참여 명령어(패킷) 받았을 때 실행하는 함수
 void PacketProceessor::GotJoinRoom(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능

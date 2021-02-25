@@ -12,7 +12,7 @@ Session::~Session()
 {
 }
 
-//  모든 세션들에 대해서 FD_SET에 해당 소켓이 들어있다면 받기/보내기 실행
+///  모든 세션들에 대해서 FD_SET에 해당 소켓이 들어있다면 받기/보내기 실행
 BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 {
 	if (FD_ISSET(GetSock(), &rset)) // 받기
@@ -38,6 +38,7 @@ BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 	return TRUE;
 }
 
+/// 플레이어 정보 셋팅
 void Session::SetPlayerInfo(const PlayerInfo& info)
 {
 	_info.id = info.id;

@@ -30,24 +30,21 @@ public:
 	SOCKET&			GetSocket() { return _sock; }
 	char&			GetBuf() { return _buf; }
 	string&			GetTotalBuf() { return _totalBuf; }
-	int				GetRecvBytes() const { return _recvbytes; }
 	int				GetSocketType() const { return _socketType; }
 
-	string			GetIPAddress(); // 아이피 주소(숫자)를 반환
-	int				GetPort(); // 포트번호(숫자)를 반환
+	string			GetIPAddress();		// 아이피 주소(숫자)를 반환
+	int				GetPort();			// 포트번호(숫자)를 반환
 
 	void			SetBuf(const char& buf) { this->_buf = buf; }
 	void			SetSocket(const SOCKET sock) { this->_sock = sock; }
-	void			SetRecvBytes(const int& recvbytes) { this->_recvbytes = recvbytes; }
 	void			SetSession(Session* sess) { this->_parent = sess; };
 
 private:
 	SOCKET			_sock;
-	EndPoint		_endpoint;
-	Session*		_parent;
+	EndPoint		_endpoint;			// 소켓어드레스, 포트
+	Session*		_parent;			// 이 소켓을 가지고 있는 session
 
-	char			_buf;
-	string			_totalBuf;
-	int				_recvbytes;
-	int				_socketType;
+	char			_buf;				// char(한글자) 버퍼
+	string			_totalBuf;			// buf를 모아둔 string 버퍼
+	int				_socketType;		// 소켓 타입(TCP, UDP)
 };

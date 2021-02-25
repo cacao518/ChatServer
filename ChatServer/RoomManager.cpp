@@ -55,23 +55,22 @@ void RoomManager::ShowRoomInfo(Session * sess, UINT roomID)
 	string name = room->GetRoomInfo()._roomName;
 	string message = "=========================================================\r\n";
 	message.append("		" + name + " 방 정보 \r\n=========================================================\r\n");
-	message.append(" 방장	ID	이름			\r\n");
+	message.append(" ID	이름			방장\r\n");
 	message.append("---------------------------------------------------------\r\n");
 
 	for (auto client : room->GetMembers())
 	{
 		bool isMaster = false;
-
 		Session* master = room->GetMaster();
-		if (master != nullptr) isMaster = true;
+		if (client == master) isMaster = true;
 
 		UINT id = client->GetPlayerInfo().id;
 		string name = client->GetPlayerInfo().name;
 
 		if(isMaster) 
-			message.append("Master	" + to_string(id) + "	" + name + "\r\n");
+			message.append(to_string(id) + "	" + name + "			Master" + "\r\n");
 		else
-			message.append("		" + to_string(id) + "	" + name + "\r\n");
+			message.append(to_string(id) + "	" + name + "\r\n");
 	}
 	message.append("\r\n");
 	message.append("\r\n입력> ");

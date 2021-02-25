@@ -2,16 +2,9 @@
 #include <string>
 using namespace std;
 
-//#define SERVERPORT 9000
-//#define BUFSIZE    512
-//#define ROOM_USER_MAX 100
-
 constexpr int SERVERPORT = 9000;
 constexpr int BUFSIZE = 512;
 constexpr int ROOM_USER_MAX = 100;
-
-//constexpr int CHAT_BUF_MAX = 100;
-//constexpr int COMMAND_MAX = 10;
 
 enum class PacketKind {
 	Login,				//		로그인 : /login 닉네임

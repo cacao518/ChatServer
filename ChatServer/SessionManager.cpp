@@ -35,7 +35,6 @@ Session* SessionManager::AddSession(SOCKET sock)
 	}
 
 	ptr->GetTcpSock().SetSocket(sock);
-	ptr->GetTcpSock().SetRecvBytes(0);
 	_clients.insert(ptr);
 
 	// 방금 추가한 세션 반환

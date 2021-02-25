@@ -25,14 +25,15 @@ public:
 	void GotJoinRoom(Session* sess, const char* data);
 
 	void Chat(Session* sess);
-
+	
 public:
 	using PacketHandler = std::function<void(Session*, const char* data)>;
-	unordered_map<PacketKind, PacketHandler> _packetHandleMap;
+	unordered_map<PacketKind, PacketHandler> _packetHandleMap;		/// 핸들러 함수 집합 (key:패킷종류, value:함수)
 
 private:
-	vector<string> _command;
+	vector<string> _command;	/// 명령어 string 집합
 
-	RoomManager*	_roomMgr;
-	SessionManager* _sessMgr;
+
+	RoomManager*	_roomMgr;	/// 룸 매니저
+	SessionManager* _sessMgr;	/// 세션 매니저
 };
