@@ -32,16 +32,16 @@ PacketProceessor::PacketProceessor()
 	_command.push_back("/join ");
 
 	// 리시브 핸들러 함수 등록
-	_packetHandleMap[PacketKind::Login] = [this](Session* sess, const char* data) { GotLogin(sess, data); };
-	_packetHandleMap[PacketKind::Help] = [this](Session* sess, const char* data) { GotHelp(sess); };
-	_packetHandleMap[PacketKind::Exit] = [this](Session* sess, const char* data) { GotExit(sess); };
-	_packetHandleMap[PacketKind::ShowRoom] = [this](Session* sess, const char* data) { GotShowRoom(sess); };
-	_packetHandleMap[PacketKind::ShowUser] = [this](Session* sess, const char* data) { GotShowUser(sess); };
-	_packetHandleMap[PacketKind::ShowRoomInfo] = [this](Session* sess, const char* data) { GotShowRoomInfo(sess, data); };
-	_packetHandleMap[PacketKind::ShowUserInfo] = [this](Session* sess, const char* data) { GotShowUserInfo(sess, data); };
-	_packetHandleMap[PacketKind::Whisper] = [this](Session* sess, const char* data) { GotWhisper(sess, data); };
-	_packetHandleMap[PacketKind::JoinRoom] = [this](Session* sess, const char* data) { GotJoinRoom(sess, data); };
-	_packetHandleMap[PacketKind::MakeRoom] = [this](Session* sess, const char* data) { GotMakeRoom(sess, data); };
+	_packetHandleMap[PacketKind::Login] = [this](Session* sess, const char* data) { return GotLogin(sess, data); };
+	_packetHandleMap[PacketKind::Help] = [this](Session* sess, const char* data) { return GotHelp(sess); };
+	_packetHandleMap[PacketKind::Exit] = [this](Session* sess, const char* data) { return GotExit(sess); };
+	_packetHandleMap[PacketKind::ShowRoom] = [this](Session* sess, const char* data) { return GotShowRoom(sess); };
+	_packetHandleMap[PacketKind::ShowUser] = [this](Session* sess, const char* data) { return GotShowUser(sess); };
+	_packetHandleMap[PacketKind::ShowRoomInfo] = [this](Session* sess, const char* data) { return GotShowRoomInfo(sess, data); };
+	_packetHandleMap[PacketKind::ShowUserInfo] = [this](Session* sess, const char* data) { return GotShowUserInfo(sess, data); };
+	_packetHandleMap[PacketKind::Whisper] = [this](Session* sess, const char* data) { return GotWhisper(sess, data); };
+	_packetHandleMap[PacketKind::JoinRoom] = [this](Session* sess, const char* data) { return GotJoinRoom(sess, data); };
+	_packetHandleMap[PacketKind::MakeRoom] = [this](Session* sess, const char* data) { return GotMakeRoom(sess, data); };
 }
 
 /// 세션이 리시브를 하고 난 다음에 이 함수를 실행하여 핸들러를 실행한다.
@@ -65,7 +65,9 @@ BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
 			pkKind = (PacketKind)i;
 
 			// (3) 커맨드(패킷)에 해당하는 함수 실행
-			_packetHandleMap[pkKind](sess, str.c_str());
+			if(_packetHandleMap[pkKind](sess, str.c_str()) == FALSE) 
+				SendWarningMessage(sess);
+
 			return TRUE;
 		}
 	}
@@ -77,26 +79,28 @@ BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
 }
 
 /// 로그인 명령어(패킷) 받았을 때 실행하는 함수
-void PacketProceessor::GotLogin(Session* sess, const char* data)
+BOOL PacketProceessor::GotLogin(Session* sess, const char* data)
 {
 	// 로그인이 되어있으면 사용 불가능
-	if (sess->GetIsLogin() == true) return;
+	if (sess->GetIsLogin() == true) return FALSE;
 
 	string message = "=========================================================\r\n		로그인되었습니다.\r\n\r\n(도움말 : /help   나가기 : /exit)\r\n=========================================================\r\n";
 	sess->GetTcpSock().Send(message.c_str());
 
 	sess->SetPlayerInfo( PlayerInfo{ _sessMgr->GetNewSessID(), data } );		// 로그인한 세션 정보 셋팅 ( 고유번호, 아이디 )
-	sess->SetCurRoom(_roomMgr->GetRooms()[0]);								// 현재 방 로비로 셋팅
-	_roomMgr->GetRooms()[0]->EnterRoom(sess);								// 로비방 입장 (로비 인덱스 = 0)
+	sess->SetCurRoom(_roomMgr->GetRooms()[1]);								// 현재 방 로비로 셋팅
+	_roomMgr->GetRooms()[1]->EnterRoom(sess);								// 로비방 입장 (로비 인덱스 = 1)
 
 	sess->SetIsLogin(true);
+
+	return TRUE;
 }
 
 /// 도움말 명령어(패킷) 받았을 때 실행하는 함수
-void PacketProceessor::GotHelp(Session * sess)
+BOOL PacketProceessor::GotHelp(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
-	if (sess->GetIsLogin() == false) return;
+	if (sess->GetIsLogin() == false) return FALSE;
 
 	string message = "=========================================================\r\n";
 	message.append("		*	도움말		*		\r\n");
@@ -113,13 +117,15 @@ void PacketProceessor::GotHelp(Session * sess)
 	message.append("=========================================================\r\n");
 	message.append("\r\n입력> ");
 	sess->GetTcpSock().Send(message.c_str());
+
+	return TRUE;
 }
 
 /// 나가기 명령어(패킷) 받았을 때 실행하는 함수
-void PacketProceessor::GotExit(Session * sess)
+BOOL PacketProceessor::GotExit(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
-	if (sess->GetIsLogin() == false) return;
+	if (sess->GetIsLogin() == false) return FALSE;
 
 	// 현재 방이 로비일 경우
 	if (sess->GetCurRoom()->GetRoomInfo()._isLobby == true)
@@ -134,52 +140,58 @@ void PacketProceessor::GotExit(Session * sess)
 		sess->GetTcpSock().Send(message.c_str());
 
 		sess->GetCurRoom()->LeaveRoom(sess);					// 이전 방 나가기
-		sess->SetCurRoom(_roomMgr->GetRooms()[0]);				// 현재 방 로비로 셋팅
-		_roomMgr->GetRooms()[0]->EnterRoom(sess);				// 로비방 입장 (로비 인덱스 = 0)
+		sess->SetCurRoom(_roomMgr->GetRooms()[1]);				// 현재 방 로비로 셋팅
+		_roomMgr->GetRooms()[1]->EnterRoom(sess);				// 로비방 입장 (로비 인덱스 = 1)
 	}
+
+	return TRUE;
 }
 
 /// 모든 방 출력 명령어(패킷) 받았을 때 실행하는 함수
-void PacketProceessor::GotShowRoom(Session * sess)
+BOOL PacketProceessor::GotShowRoom(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
-	if (sess->GetIsLogin() == false) return;
+	if (sess->GetIsLogin() == false) return FALSE;
 
 	_roomMgr->ShowRoomList(sess);
+
+	return TRUE;
 }
 
 ///모든 유저 보기 명령어(패킷) 받았을 때 실행하는 함수
-void PacketProceessor::GotShowUser(Session * sess)
+BOOL PacketProceessor::GotShowUser(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
-	if (sess->GetIsLogin() == false) return;
+	if (sess->GetIsLogin() == false) return FALSE;
 
 	_sessMgr->ShowUserList(sess);
+
+	return TRUE;
 }
 
 ///방 정보 보기 명령어(패킷) 받았을 때 실행하는 함수
-void PacketProceessor::GotShowRoomInfo(Session * sess, const char * data)
+BOOL PacketProceessor::GotShowRoomInfo(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
-	if (sess->GetIsLogin() == false) return;
+	if (sess->GetIsLogin() == false) return FALSE;
 
-	_roomMgr->ShowRoomInfo(sess, (UINT)atoi(data));
+	return _roomMgr->ShowRoomInfo(sess, (UINT)atoi(data));
 }
 
 ///유저 정보 보기 명령어(패킷) 받았을 때 실행하는 함수
-void PacketProceessor::GotShowUserInfo(Session * sess, const char * data)
+BOOL PacketProceessor::GotShowUserInfo(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
-	if (sess->GetIsLogin() == false) return;
+	if (sess->GetIsLogin() == false) return FALSE;
 
-	_sessMgr->ShowUserInfo(sess, (UINT)atoi(data));
+	return _sessMgr->ShowUserInfo(sess, string(data));
 }
 
 ///귓속말 명령어(패킷) 받았을 때 실행하는 함수
-void PacketProceessor::GotWhisper(Session * sess, const char * data)
+BOOL PacketProceessor::GotWhisper(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
-	if (sess->GetIsLogin() == false) return;
+	if (sess->GetIsLogin() == false) return FALSE;
 
 	string recvClientName(data);
 	string sendData(data);
@@ -192,9 +204,9 @@ void PacketProceessor::GotWhisper(Session * sess, const char * data)
 		sendData = sendData.substr(range + 1, sendData.size());
 	}
 	else
-		return;
+		return FALSE;
 
-	if (recvClientName == sess->GetPlayerInfo().name) return; // 나한테 귓말 날리는건 안됨.
+	if (recvClientName == sess->GetPlayerInfo().name) return FALSE; // 나한테 귓말 날리는건 안됨.
 
 	// (3) 클라이언트 찾아서 귓말 날리기
 	bool isFindSuccess = false;
@@ -202,29 +214,31 @@ void PacketProceessor::GotWhisper(Session * sess, const char * data)
 	{
 		if (client->GetPlayerInfo().name == recvClientName)
 		{
-			if (client->GetIsLogin() == false) return;
+			if (client->GetIsLogin() == false) return FALSE;
 			string finalSendData = "\r\n [귓속말] [" + recvClientName + "] " + sendData + "\r\n\r\n입력> ";
 			client->GetTcpSock().Send(finalSendData.c_str());
 			isFindSuccess = true;
 			break;
 		}
 	}
-	if (isFindSuccess == false) return;			// 못찾으면 리턴.
+	if (isFindSuccess == false) return FALSE;		// 못찾으면 리턴.
 
 	string message = "=========================================================\r\n		귓속말을 보냈습니다.\r\n=========================================================\r\n";
 	message.append("\r\n입력> ");
 	sess->GetTcpSock().Send(message.c_str());
+
+	return TRUE;
 }
 
 /// 방만들기 명령어(패킷) 받았을 때 실행하는 함수
-void PacketProceessor::GotMakeRoom(Session * sess, const char * data)
+BOOL PacketProceessor::GotMakeRoom(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
-	if (sess->GetIsLogin() == false) return;
+	if (sess->GetIsLogin() == false) return FALSE;
 
 	string name(data);
 	Room* room = _roomMgr->AddRoom(sess, ROOM_USER_MAX, name); // 방만들기
-	if (room == nullptr) return;
+	if (room == nullptr) return FALSE;
 
 	string message = "=========================================================\r\n		대화방이 생성되었습니다.\r\n=========================================================\r\n";
 	sess->GetTcpSock().Send(message.c_str());
@@ -232,21 +246,23 @@ void PacketProceessor::GotMakeRoom(Session * sess, const char * data)
 	sess->GetCurRoom()->LeaveRoom(sess);					// 이전 방 나가기
 	sess->SetCurRoom(room);									// 새로운 방으로 설정
 	room->EnterRoom(sess);									// 새로운 방 입장
+
+	return TRUE;
 }
 
 ///방 참여 명령어(패킷) 받았을 때 실행하는 함수
-void PacketProceessor::GotJoinRoom(Session * sess, const char * data)
+BOOL PacketProceessor::GotJoinRoom(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
-	if (sess->GetIsLogin() == false) return;
+	if (sess->GetIsLogin() == false) return FALSE;
 
 	// 방 검색
 	auto roomIter = _roomMgr->GetRooms().find(atoi(data));
-	if (roomIter == _roomMgr->GetRooms().end()) return;		// 방 없으면 취소 
+	if (roomIter == _roomMgr->GetRooms().end()) return FALSE;	// 방 없으면 취소 
 
 	// 현재 내가 있는 방이면 취소
 	auto room = (*roomIter).second;
-	if (room == sess->GetCurRoom()) return;					
+	if (room == sess->GetCurRoom()) return FALSE;
 
 	string message = "=========================================================\r\n		대화방에 참가했습니다.\r\n=========================================================\r\n";
 	sess->GetTcpSock().Send(message.c_str());
@@ -254,6 +270,8 @@ void PacketProceessor::GotJoinRoom(Session * sess, const char * data)
 	sess->GetCurRoom()->LeaveRoom(sess);					// 이전 방 나가기
 	sess->SetCurRoom(room);									// 새로운 방으로 설정
 	(*roomIter).second->EnterRoom(sess);					// 새로운 방 입장
+
+	return TRUE;
 }
 
 
@@ -288,4 +306,11 @@ void PacketProceessor::Chat(Session * sess)
 	// 버퍼 비우기
 	sess->GetTcpSock().SetBuf('\0');
 	sess->GetTcpSock().GetTotalBuf().clear();
+}
+
+void PacketProceessor::SendWarningMessage(Session * sess)
+{
+	// 명령어 오류 메세지 보내기
+	string message = "\r\n		 * 명령어 수행에 실패했습니다.\r\n\n입력> \0";
+	sess->GetTcpSock().Send(message.c_str());
 }

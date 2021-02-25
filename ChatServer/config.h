@@ -5,6 +5,7 @@ using namespace std;
 constexpr int SERVERPORT = 9000;
 constexpr int BUFSIZE = 512;
 constexpr int ROOM_USER_MAX = 100;
+constexpr int USER_NUM_MAX = 9999;
 
 enum class PacketKind {
 	Login,				//		로그인 : /login 닉네임

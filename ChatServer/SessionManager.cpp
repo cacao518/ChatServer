@@ -2,7 +2,12 @@
 #include "TcpSocket.h"
 #include "Session.h"
 
-
+///////////////////////////////////
+/// @brief 무슨 함수 ㅇㄴㅁㅇㅁㄴ
+///
+///	@param	sock	뭐하는 변수
+///	@param	sock	뭐하는 변수
+//////////////////////////////////
 SessionManager* SessionManager::instance = nullptr;
 
 SessionManager* SessionManager::GetInstance()
@@ -14,12 +19,6 @@ SessionManager* SessionManager::GetInstance()
 
 }
 
-///////////////////////////////////
-/// @brief 무슨 함수 ㅇㄴㅁㅇㅁㄴ
-///
-///	@param	sock	뭐하는 변수
-///	@param	sock	뭐하는 변수
-//////////////////////////////////
 Session* SessionManager::AddSession(SOCKET sock)
 {
 	if (_clients.size() >= FD_SETSIZE) {
@@ -76,27 +75,25 @@ void SessionManager::RemoveSession(Session* client)
 	delete ptr;
 }
 
-void SessionManager::ShowUserInfo(Session * sess, UINT ID)
+BOOL SessionManager::ShowUserInfo(Session * sess, string name)
 {
 	UINT id;
-	string name;
 	UINT curRoomID;
 	string curRoomName;
 	bool isFindSuccess = false;
 	for (auto client : _clients)
 	{
-		if (client->GetPlayerInfo().id == ID)
+		if (client->GetPlayerInfo().name == name)
 		{
-			if (client->GetIsLogin() == false) return;
+			if (client->GetIsLogin() == false) return FALSE;
 			id = client->GetPlayerInfo().id;
-			name = client->GetPlayerInfo().name;
 			curRoomID = client->GetCurRoom()->GetRoomInfo()._roomID;
 			curRoomName = client->GetCurRoom()->GetRoomInfo()._roomName;
 			isFindSuccess = true;
 			break;
 		}
 	}
-	if (isFindSuccess == false) return;
+	if (isFindSuccess == false) return FALSE;
 	string message = "=========================================================\r\n";
 	message.append("		" + name + " 유저 정보 \r\n=========================================================\r\n");
 	message.append(" ID	이름		현재방 ID	현재 방 이름\r\n");
@@ -107,6 +104,8 @@ void SessionManager::ShowUserInfo(Session * sess, UINT ID)
 	message.append("\r\n");
 	message.append("\r\n입력> ");
 	sess->GetTcpSock().Send(message.c_str());
+
+	return TRUE;
 }
 
 void SessionManager::ShowUserList(Session * sess)

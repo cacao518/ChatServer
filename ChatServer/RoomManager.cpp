@@ -34,8 +34,8 @@ void RoomManager::RemoveRoom(Room * room)
 	{
 		if (client == nullptr) continue;
 		room->LeaveRoom(client);			// 방에서 나오기
-		client->SetCurRoom(_rooms[0]);		// 현재 방 로비로 설정
-		_rooms[0]->EnterRoom(client);		// 로비 입장
+		client->SetCurRoom(_rooms[1]);		// 현재 방 로비로 설정
+		_rooms[1]->EnterRoom(client);		// 로비 입장
 
 	}
 
@@ -46,11 +46,11 @@ void RoomManager::RemoveRoom(Room * room)
 }
 
 /// 선택한 방 정보 출력
-void RoomManager::ShowRoomInfo(Session * sess, UINT roomID)
+BOOL RoomManager::ShowRoomInfo(Session * sess, UINT roomID)
 {
-	if (_rooms.find(roomID) == _rooms.end()) return; // 찾는 방이 없으면 리턴
+	if (_rooms.find(roomID) == _rooms.end()) return FALSE; // 찾는 방이 없으면 리턴
 	Room* room = _rooms.find(roomID)->second;
-	if (room == nullptr) return;					// 찾았는데 방이 nullptr라도 리턴
+	if (room == nullptr) return FALSE;					// 찾았는데 방이 nullptr라도 리턴
 
 	string name = room->GetRoomInfo()._roomName;
 	string message = "=========================================================\r\n";
@@ -75,6 +75,8 @@ void RoomManager::ShowRoomInfo(Session * sess, UINT roomID)
 	message.append("\r\n");
 	message.append("\r\n입력> ");
 	sess->GetTcpSock().Send(message.c_str());
+
+	return TRUE;
 }
 
 /// 전체 방 목록 출력

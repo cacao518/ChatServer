@@ -22,12 +22,23 @@ BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 		GetTcpSock().GetTotalBuf().push_back(GetTcpSock().GetBuf());
 	}
 
-	// 엔터치면 아래줄 활성화
+	// 엔터/백스페이스 치면 아래줄 활성화
 	if (FD_ISSET(GetSock(), &wset)) // 보내기
-	{
+	{	
+		// 백스페이스 시전시 내용 다 비우기
+		if (_socket.GetBuf() == '\b')
+		{
+			// 버퍼 비우기
+			_socket.SetBuf('\0');
+			_socket.GetTotalBuf().clear();
+			_socket.Send("\r\n입력> ");
+			return FALSE;
+		}
+
 		// 클라로 부터 받은 패킷에 따른 함수 처리
 		PacketProceessor::GetInstance()->PacketProcess(this, GetTcpSock().GetTotalBuf().c_str());
 
+		// 나가는 명령어 시전 방지
 		if (this->_isExit) return FALSE;
 
 		// 버퍼 비우기
