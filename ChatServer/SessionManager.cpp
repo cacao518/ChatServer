@@ -114,6 +114,7 @@ void SessionManager::ShowUserList(Session * sess)
 
 	for (auto client : _clients)
 	{
+		if (client->GetIsLogin() == false) continue;
 		UINT id = client->GetPlayerInfo().id;
 		string name = client->GetPlayerInfo().name;
 
