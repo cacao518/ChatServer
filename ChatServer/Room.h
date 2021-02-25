@@ -3,6 +3,9 @@
 #include "Session.h"
 #include "config.h"
 
+
+/*	클라이언트들이 들어있는 대화방  */   
+
 class Room {
 
 public:

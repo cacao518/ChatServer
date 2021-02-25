@@ -70,7 +70,7 @@ BOOL ServerContext::Run()
 
 		for (auto it : clients)
 		{
-			// 엔터 or 백스페이스 시 쓰기 셋에 추가
+			// 엔터 or 백스페이스, 방향키 시 쓰기 셋에 추가
 			if (it->GetTcpSock().GetBuf() == '\n' || it->GetTcpSock().GetBuf() == '\b')
 				FD_SET(it->GetSock(), &wset);
 			else

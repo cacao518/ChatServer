@@ -4,6 +4,8 @@
 
 class Room;
 
+/*	클라이언트의 역할을 하는 클래스      */
+
 class Session {
 
 public:	

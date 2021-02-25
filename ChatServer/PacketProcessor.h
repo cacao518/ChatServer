@@ -4,6 +4,10 @@
 #include <functional>
 #include <stdlib.h>
 
+/*
+	클라이언트로 부터 받은 패킷에 대해 핸들러 함수를 실행하는 클래스
+*/
+
 class PacketProceessor {
 
 	static PacketProceessor* instance;
@@ -26,7 +30,7 @@ public:
 	BOOL GotKick(Session* sess, const char* data);
 
 	void Chat(Session* sess);
-	void SendWarningMessage(Session* sess);
+	void SendWarningMessage(Session* sess, WarningKind warningKind);
 
 public:
 	using PacketHandler = function<BOOL(Session*, const char* data)>;

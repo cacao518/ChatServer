@@ -9,6 +9,10 @@
 
 class Session;
 
+/*	
+	클라이언트(세션)의 집합을 가지고 있고 생성/제거 관리하는 매니저     
+*/
+
 class SessionManager {
 	static SessionManager* instance;		
 public:

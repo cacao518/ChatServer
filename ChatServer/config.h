@@ -5,7 +5,8 @@ using namespace std;
 constexpr int SERVERPORT = 9000;
 constexpr int BUFSIZE = 512;
 constexpr int ROOM_USER_MAX = 100;
-constexpr int USER_NUM_MAX = 9999;
+constexpr int USER_NUM_MAX = 50;
+constexpr int ROOM_NUM_MAX = 50;
 
 enum class PacketKind {
 	Login,				//		로그인 : /login 닉네임
@@ -19,6 +20,11 @@ enum class PacketKind {
 	MakeRoom,			//		방만들기 : /make 최대인원 방제목
 	JoinRoom,			//		방 참여 : /join 방번호  
 	Kick,				//		강퇴(방장만가능) : /kick 이름
+	End
+};
+enum class WarningKind {
+	WrongCommand,
+	LoginFail,
 	End
 };
 

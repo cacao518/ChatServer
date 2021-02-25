@@ -9,6 +9,10 @@
 
 class Room;
 
+/*
+	대화방의 집합을 가지고 있고 생성/제거 관리하는 매니저
+*/
+
 class RoomManager {
 	static RoomManager* instance;
 public:

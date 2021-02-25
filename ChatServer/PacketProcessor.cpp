@@ -69,11 +69,15 @@ BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
 
 			// (3) 커맨드(패킷)에 해당하는 함수 실행, 분리한 데이터를 넘겨준다.
 			if(_packetHandleMap[pkKind](sess, str.c_str()) == FALSE)
-				SendWarningMessage(sess); // 명령어 수행에 실패하면 오류 메세지를 송신한다.
+				SendWarningMessage(sess, WarningKind::WrongCommand); // 명령어 수행에 실패하면 오류 메세지를 송신한다.
 
 			return TRUE;
 		}
 	}
+
+	// 로그인 안되어있는데 로그인 명령어 안쓰고 넘어오면 경고메세지 띄우기
+	if(sess->GetIsLogin() == false)
+		SendWarningMessage(sess, WarningKind::LoginFail);
 	
 	// 명령어에 걸리지 않는다면 그냥 일반 채팅으로 뿌리기
 	Chat(sess);
@@ -86,6 +90,10 @@ BOOL PacketProceessor::GotLogin(Session* sess, const char* data)
 {
 	// 로그인이 되어있으면 사용 불가능
 	if (sess->GetIsLogin() == true) return FALSE;
+	
+	// 아이디에 공백 불가능
+	string str(data);
+	if (str.find(" ") != string::npos) return FALSE;
 
 	string message = "=========================================================\r\n		로그인되었습니다.\r\n\r\n(도움말 : /help   나가기 : /exit)\r\n=========================================================\r\n";
 	sess->GetTcpSock().Send(message.c_str());
@@ -344,9 +352,24 @@ void PacketProceessor::Chat(Session * sess)
 	sess->GetTcpSock().GetTotalBuf().clear();
 }
 
-void PacketProceessor::SendWarningMessage(Session * sess)
+void PacketProceessor::SendWarningMessage(Session* sess, WarningKind warningKind)
 {
+	string message;
 	// 명령어 오류 메세지 보내기
-	string message = "\r\n		 * 명령어 수행에 실패했습니다.\r\n\n입력> \0";
-	sess->GetTcpSock().Send(message.c_str());
+	switch (warningKind)
+	{
+		case WarningKind::WrongCommand:
+			message = "\r\n		 * 명령어 수행에 실패했습니다.\r\n\n입력> \0";
+			sess->GetTcpSock().Send(message.c_str());
+			break;
+		
+		case WarningKind::LoginFail:
+			message = "\r\n		* 명령어를 사용해서 로그인하세요. ( /login 아이디 ) \r\n\n입력> ";
+			sess->GetTcpSock().Send(message.c_str());
+			break;
+
+		default:
+			break;
+	}
+
 }
