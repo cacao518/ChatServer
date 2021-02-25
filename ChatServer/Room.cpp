@@ -2,23 +2,23 @@
 #include "RoomManager.h"
 
 /// 로비 생성
-Room::Room(int roomCode)
+Room::Room(UINT roomCode)
 {
 	_master = nullptr;
 
 	_info._isLobby = true;
-	_info._roomCode = roomCode;
+	_info._roomID = roomCode;
 	_info._memberNumMax = ROOM_USER_MAX;
 	_info._roomName = "Lobby";
 }
  
 /// 로비가 아닌 일반 방 생성
-Room::Room(Session * master, int roomCode, int max, string name)
+Room::Room(Session * master, UINT roomCode, int max, string name)
 {
 	this->_master = master;
 
 	_info._isLobby = false;
-	_info._roomCode = roomCode;
+	_info._roomID = roomCode;
 	_info._memberNumMax = max;
 	_info._roomName = name;
 }

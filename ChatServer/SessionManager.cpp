@@ -72,5 +72,59 @@ void SessionManager::RemoveSession(Session* client)
 	
 	// 세션 set 에서 제거
 	_clients.erase(client);
+
+	client->SetIsExit(true);
 	delete ptr;
+}
+
+void SessionManager::ShowUserInfo(Session * sess, UINT ID)
+{
+	UINT id;
+	string name;
+	UINT curRoomID;
+	string curRoomName;
+	bool isFindSuccess = false;
+	for (auto client : _clients)
+	{
+		if (client->GetPlayerInfo().id == ID)
+		{
+			if (client->GetIsLogin() == false) return;
+			id = client->GetPlayerInfo().id;
+			name = client->GetPlayerInfo().name;
+			curRoomID = client->GetCurRoom()->GetRoomInfo()._roomID;
+			curRoomName = client->GetCurRoom()->GetRoomInfo()._roomName;
+			isFindSuccess = true;
+			break;
+		}
+	}
+	if (isFindSuccess == false) return;
+	string message = "=========================================================\r\n";
+	message.append("		" + name + " 유저 정보 \r\n=========================================================\r\n");
+	message.append(" ID	이름		현재방 ID	현재 방 이름\r\n");
+	message.append("---------------------------------------------------------\r\n");
+
+	message.append(" " + to_string(id) + "	" + name + "			" + to_string(curRoomID) + "	" + curRoomName + "\r\n");
+
+	message.append("\r\n");
+	message.append("\r\n입력> ");
+	sess->GetTcpSock().Send(message.c_str());
+}
+
+void SessionManager::ShowUserList(Session * sess)
+{
+	string message = "=========================================================\r\n		전체 유저 목록 \r\n=========================================================\r\n";
+	message.append("ID	이름			\r\n");
+	message.append("---------------------------------------------------------\r\n");
+
+	for (auto client : _clients)
+	{
+		UINT id = client->GetPlayerInfo().id;
+		string name = client->GetPlayerInfo().name;
+
+		message.append(" " + to_string(id) + "	" + name + "\r\n");
+	}
+
+	message.append("\r\n");
+	message.append("\r\n입력> ");
+	sess->GetTcpSock().Send(message.c_str());
 }

@@ -20,6 +20,7 @@ public:
 	PlayerInfo	GetPlayerInfo() { return _info; }
 	Room*		GetCurRoom() { return _curRoom; }
 	void		SetIsLogin(const bool& isLogin) { _isLogin = isLogin; };
+	void		SetIsExit(const bool& isExit) { _isExit = isExit; };
 	void		SetPlayerInfo(const PlayerInfo& info);
 	void		SetCurRoom(Room* parent) { _curRoom = parent; }
 
@@ -27,5 +28,7 @@ private:
 	TcpSocket	_socket;
 	PlayerInfo	_info;
 	Room*		_curRoom;
+
 	bool		_isLogin = false;
+	bool		_isExit = false;
 };

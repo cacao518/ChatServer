@@ -28,12 +28,12 @@ enum class PacketKind {
 };
 
 struct PlayerInfo {
-	int code;
+	UINT id;
 	string name;
 };
 
 struct RoomInfo {
-	int _roomCode;
+	UINT _roomID;
 	int _memberNumMax;
 	string _roomName = "unknown";
 

@@ -6,8 +6,8 @@
 class Room {
 
 public:
-	Room(int roomCode);
-	Room(Session * master, int roomCode, int max, string name);
+	Room(UINT roomCode);
+	Room(Session * master, UINT roomCode, int max, string name);
 
 	void EnterRoom(Session* sess);							/// 세션을 방에 참여시키는 함수
 	void LeaveRoom(Session* sess);							/// 세션을 방에서 내보내는 함수
@@ -16,6 +16,7 @@ public:
 
 	RoomInfo		GetRoomInfo() const { return _info; }
 	set<Session*>&	GetMembers() { return _members; };
+	Session*		GetMaster() const { return _master; }
 
 private:
 	RoomInfo		_info;			/// 방정보(고유번호,이름,최대인원,로비여부)

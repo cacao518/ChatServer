@@ -12,18 +12,21 @@ RoomManager* RoomManager::GetInstance()
 
 }
 
+/// 방 만들기
 Room* RoomManager::AddRoom(Session* master, int max, string name)
 {
-	int n = GetNewRoomID();
+	UINT id = GetNewRoomID();
 
+	// 방장이 없으면 로비, 방장을 받으면 일반 방 생성
 	if (master == nullptr)
-		_rooms[n] = new Room(n); // 로비
+		_rooms[id] = new Room(id); // 로비
 	else
-		_rooms[n] = new Room(master, n, max, name); //유저가 만든 방
+		_rooms[id] = new Room(master, id, max, name); //유저가 만든 방
 
-	return _rooms[n];
+	return _rooms[id];
 }
 
+/// 방 삭제
 void RoomManager::RemoveRoom(Room * room)
 {
 	// (1) 방에 있는 유저 다 내보낸 다음
@@ -37,7 +40,61 @@ void RoomManager::RemoveRoom(Room * room)
 	}
 
 	// (2) 방 목록도 삭제한다.
-	if (_rooms.find(room->GetRoomInfo()._roomCode) != _rooms.end())
-		_rooms.erase(room->GetRoomInfo()._roomCode);
+	if (_rooms.find(room->GetRoomInfo()._roomID) != _rooms.end())
+		_rooms.erase(room->GetRoomInfo()._roomID);
 	
+}
+
+/// 선택한 방 정보 출력
+void RoomManager::ShowRoomInfo(Session * sess, UINT roomID)
+{
+	if (_rooms.find(roomID) == _rooms.end()) return; // 찾는 방이 없으면 리턴
+	Room* room = _rooms.find(roomID)->second;
+	if (room == nullptr) return;					// 찾았는데 방이 nullptr라도 리턴
+
+	string name = room->GetRoomInfo()._roomName;
+	string message = "=========================================================\r\n";
+	message.append("		" + name + " 방 정보 \r\n=========================================================\r\n");
+	message.append(" 방장	ID	이름			\r\n");
+	message.append("---------------------------------------------------------\r\n");
+
+	for (auto client : room->GetMembers())
+	{
+		bool isMaster = false;
+
+		Session* master = room->GetMaster();
+		if (master != nullptr) isMaster = true;
+
+		UINT id = client->GetPlayerInfo().id;
+		string name = client->GetPlayerInfo().name;
+
+		if(isMaster) 
+			message.append("Master	" + to_string(id) + "	" + name + "\r\n");
+		else
+			message.append("		" + to_string(id) + "	" + name + "\r\n");
+	}
+	message.append("\r\n");
+	message.append("\r\n입력> ");
+	sess->GetTcpSock().Send(message.c_str());
+}
+
+/// 전체 방 목록 출력
+void RoomManager::ShowRoomList(Session * sess)
+{
+	string message = "=========================================================\r\n		전체 방 목록 \r\n=========================================================\r\n";
+	message.append("번호	이름			현재인원수\r\n");
+	message.append("---------------------------------------------------------\r\n");
+
+	for (auto room : _rooms)
+	{
+		UINT id = room.second->GetRoomInfo()._roomID;
+		string name = room.second->GetRoomInfo()._roomName;
+		int userNum = room.second->GetMembers().size();
+
+		message.append(" " + to_string(id) + "	" + name + "				"  + to_string(userNum) + "\r\n");
+	}
+
+	message.append("\r\n");
+	message.append("\r\n입력> ");
+	sess->GetTcpSock().Send(message.c_str());
 }

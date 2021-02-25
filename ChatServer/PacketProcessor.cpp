@@ -118,9 +118,16 @@ void PacketProceessor::GotExit(Session * sess)
 
 	// 현재 방이 로비일 경우
 	if (sess->GetCurRoom()->GetRoomInfo()._isLobby == true)
-		sess->GetCurRoom()->LeaveRoom(sess);					// 접속 종료
+	{
+		string message = "=========================================================\r\n		접속을 종료했습니다.\r\n=========================================================\r\n";
+		sess->GetTcpSock().Send(message.c_str());
+		_sessMgr->RemoveSession(sess);							// 접속 종료
+	}
 	else // 일반 방 나가기 (로비로 복귀)
 	{
+		string message = "=========================================================\r\n		대화방을 나갔습니다.\r\n=========================================================\r\n";
+		sess->GetTcpSock().Send(message.c_str());
+
 		sess->GetCurRoom()->LeaveRoom(sess);					// 이전 방 나가기
 		sess->SetCurRoom(_roomMgr->GetRooms()[0]);				// 현재 방 로비로 셋팅
 		_roomMgr->GetRooms()[0]->EnterRoom(sess);				// 로비방 입장 (로비 인덱스 = 0)
@@ -131,24 +138,32 @@ void PacketProceessor::GotShowRoom(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
 	if (sess->GetIsLogin() == false) return;
+
+	_roomMgr->ShowRoomList(sess);
 }
 
 void PacketProceessor::GotShowUser(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
 	if (sess->GetIsLogin() == false) return;
+
+	_sessMgr->ShowUserList(sess);
 }
 
 void PacketProceessor::GotShowRoomInfo(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
 	if (sess->GetIsLogin() == false) return;
+
+	_roomMgr->ShowRoomInfo(sess, (UINT)atoi(data));
 }
 
 void PacketProceessor::GotShowUserInfo(Session * sess, const char * data)
 {
 	// 로그인이 안되어있으면 사용 불가능
 	if (sess->GetIsLogin() == false) return;
+
+	_sessMgr->ShowUserInfo(sess, (UINT)atoi(data));
 }
 
 void PacketProceessor::GotWhisper(Session * sess, const char * data)
@@ -211,7 +226,7 @@ void PacketProceessor::Chat(Session * sess)
 	string str = "[" + sess->GetPlayerInfo().name + "] : " + sess->GetTcpSock().GetTotalBuf();
 	toClientBuf.append( str );
 
-	// retBuf 서버에 먼저 출력
+	// 서버에 먼저 출력
 	addrlen = sizeof(clientaddr);
 	getpeername(sess->GetSock(), (SOCKADDR*)&clientaddr, &addrlen);
 	printf("[%s : %d]", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));

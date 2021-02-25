@@ -28,6 +28,8 @@ BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 		// 클라로 부터 받은 패킷에 따른 함수 처리
 		PacketProceessor::GetInstance()->PacketProcess(this, GetTcpSock().GetTotalBuf().c_str());
 
+		if (this->_isExit) return FALSE;
+
 		// 버퍼 비우기
 		GetTcpSock().SetBuf('\0');
 		GetTcpSock().GetTotalBuf().clear();
@@ -38,6 +40,6 @@ BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 
 void Session::SetPlayerInfo(const PlayerInfo& info)
 {
-	_info.code = info.code;
+	_info.id = info.id;
 	_info.name = info.name;
 }
