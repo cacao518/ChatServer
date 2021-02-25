@@ -23,8 +23,8 @@ PacketProceessor::PacketProceessor()
 	_command.push_back("/login ");
 	_command.push_back("/help");
 	_command.push_back("/exit");
-	_command.push_back("/all user");
-	_command.push_back("/all room");
+	_command.push_back("/user");
+	_command.push_back("/room");
 	_command.push_back("/r ");
 	_command.push_back("/i ");
 	_command.push_back("/w ");
@@ -52,23 +52,43 @@ BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
 {
 	if (sess == nullptr) return FALSE;
 
+	bool isCommand;
 	PacketKind pkKind;
 	string str(data);
 
 	// 클라로 부터 받은 data가 명령어에 걸리는지 체크
 	for (int i = 0; i < (int)PacketKind::End; i++)
 	{
-		// (1) 받은 문자 맨앞에 커맨드가 있을 경우
-		if (str.find(_command[ i ] ) == 0)
+		isCommand = false;
+		// (1) 커맨드만 있고 커맨드 뒤에 추가 데이터가 없는 명령어 체크
+		if (i >= (int)PacketKind::Help && i <= (int)PacketKind::ShowRoom)
 		{
-			// (2) 커맨드 + 데이터 분리
-			auto range = _command[ i ].size();
-			str.erase(0, range);
-			str.erase(str.size() - 2, str.size());
-			pkKind = (PacketKind)i;
-
+			string compareStr = _command[i];
+			compareStr.append("\r\n");
+			// (2) 정확히 커맨드만 썼을 때 통과시킨다.
+			if (str == compareStr)
+			{
+				pkKind = (PacketKind)i;
+				isCommand = true;
+			}
+		}
+		else // 커맨드 + 데이터가 있는 명령어 체크
+		{
+			// (1) 받은 문자 맨앞에 커맨드가 있을 경우
+			if (str.find(_command[i]) == 0)
+			{
+				// (2) 커맨드 + 데이터 분리
+				auto range = _command[i].size();
+				str.erase(0, range);
+				str.erase(str.size() - 2, str.size());
+				pkKind = (PacketKind)i;
+				isCommand = true;
+			}
+		}
+		if (isCommand == true)
+		{
 			// (3) 커맨드(패킷)에 해당하는 함수 실행, 분리한 데이터를 넘겨준다.
-			if(_packetHandleMap[pkKind](sess, str.c_str()) == FALSE)
+			if (_packetHandleMap[pkKind](sess, str.c_str()) == FALSE)
 				SendWarningMessage(sess, WarningKind::WrongCommand); // 명령어 수행에 실패하면 오류 메세지를 송신한다.
 
 			return TRUE;
@@ -98,6 +118,10 @@ BOOL PacketProceessor::GotLogin(Session* sess, const char* data)
 	string message = "=========================================================\r\n		로그인되었습니다.\r\n\r\n(도움말 : /help   나가기 : /exit)\r\n=========================================================\r\n";
 	sess->GetTcpSock().Send(message.c_str());
 
+	// 버퍼 비우기
+	sess->GetTcpSock().SetBuf('\0');
+	sess->GetTcpSock().GetTotalBuf().clear();
+
 	sess->SetPlayerInfo( PlayerInfo{ _sessMgr->GetNewSessID(), data } );		// 로그인한 세션 정보 셋팅 ( 고유번호, 아이디 )
 	sess->SetCurRoom(_roomMgr->GetRooms()[1]);								// 현재 방 로비로 셋팅
 	_roomMgr->GetRooms()[1]->EnterRoom(sess);								// 로비방 입장 (로비 인덱스 = 1)
@@ -117,8 +141,8 @@ BOOL PacketProceessor::GotHelp(Session * sess)
 	message.append("		*	도움말		*		\r\n");
 	message.append("=========================================================\r\n");
 	message.append("/help			: 도움말\r\n");
-	message.append("/all user		: 모든 유저 보기\r\n");
-	message.append("/all room		: 모든 방 보기\r\n");
+	message.append("/user			: 모든 유저 보기\r\n");
+	message.append("/room			: 모든 방 보기\r\n");
 	message.append("/r [방번호]		: 방 정보 보기\r\n");
 	message.append("/i [아이디]		: 유저 정보 보기\r\n");
 	message.append("/w [아이디] [메시지]	: 귓속말\r\n");
@@ -138,6 +162,10 @@ BOOL PacketProceessor::GotExit(Session * sess)
 {
 	// 로그인이 안되어있으면 사용 불가능
 	if (sess->GetIsLogin() == false) return FALSE;
+
+	// 버퍼 비우기
+	sess->GetTcpSock().SetBuf('\0');
+	sess->GetTcpSock().GetTotalBuf().clear();
 
 	// 현재 방이 로비일 경우
 	if (sess->GetCurRoom()->GetRoomInfo()._isLobby == true)
@@ -249,11 +277,20 @@ BOOL PacketProceessor::GotMakeRoom(Session * sess, const char * data)
 	if (sess->GetIsLogin() == false) return FALSE;
 
 	string name(data);
+
+	// 방이름에 공백 불가능
+	string str(data);
+	if (str.find(" ") != string::npos) return FALSE;
+
 	Room* room = _roomMgr->AddRoom(sess, ROOM_USER_MAX, name); // 방만들기
 	if (room == nullptr) return FALSE;
 
 	string message = "=========================================================\r\n		대화방이 생성되었습니다.\r\n=========================================================\r\n";
 	sess->GetTcpSock().Send(message.c_str());
+
+	// 버퍼 비우기
+	sess->GetTcpSock().SetBuf('\0');
+	sess->GetTcpSock().GetTotalBuf().clear();
 
 	sess->GetCurRoom()->LeaveRoom(sess);					// 이전 방 나가기
 	sess->SetCurRoom(room);									// 새로운 방으로 설정
@@ -278,6 +315,10 @@ BOOL PacketProceessor::GotJoinRoom(Session * sess, const char * data)
 
 	string message = "=========================================================\r\n		대화방에 참가했습니다.\r\n=========================================================\r\n";
 	sess->GetTcpSock().Send(message.c_str());
+
+	// 버퍼 비우기
+	sess->GetTcpSock().SetBuf('\0');
+	sess->GetTcpSock().GetTotalBuf().clear();
 
 	sess->GetCurRoom()->LeaveRoom(sess);					// 이전 방 나가기
 	sess->SetCurRoom(room);									// 새로운 방으로 설정
@@ -307,6 +348,10 @@ BOOL PacketProceessor::GotKick(Session * sess, const char * data)
 	}
 	if (name == sess->GetPlayerInfo().name) return FALSE;	 // 자기 자신 추방은 안돼.
 	if (isFindSuccess == false) return FALSE;				// 강퇴할 대상 탐색 실패
+
+	// 버퍼 비우기
+	sess->GetTcpSock().SetBuf('\0');
+	sess->GetTcpSock().GetTotalBuf().clear();
 
 	string message = "\r\n		 * " + kickedUser->GetPlayerInfo().name + "님이 추방당했습니다. \r\n\n입력> \0";
 	sess->GetCurRoom()->SendAllToRoomMembers(message.c_str());

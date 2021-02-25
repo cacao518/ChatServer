@@ -54,7 +54,7 @@ void Room::LeaveRoom(Session * sess)
 		if (iter != _members.end())
 		{
 			SetMaster((*iter));
-			string message = "\r\n		 * " + (*iter)->GetPlayerInfo().name + "님으로 방장이 위임되었습니다. \r\n\n입력> \0";
+			message = "\r\n		 * " + (*iter)->GetPlayerInfo().name + "님으로 방장이 위임되었습니다. \r\n\n입력> \0";
 			SendAllToRoomMembers(message.c_str());
 		}
 	}
@@ -72,6 +72,13 @@ void Room::SendData(Session * sess, const char * data)
 		// 채팅을 보낸 클라이언트는 제외
 		if (client->GetSock() == sess->GetSock()) continue;
 		client->GetTcpSock().Send(data);
+
+		// 만약 채팅치고 있는 클라였다면 쳤던거 화면에 다시 뿌리기
+		if (client->GetTcpSock().GetTotalBuf().size() != 0)
+		{
+			string chatData = client->GetTcpSock().GetTotalBuf();
+			client->GetTcpSock().Send( chatData.c_str() );
+		}
 	}
 }
 
@@ -80,6 +87,13 @@ void Room::SendAllToRoomMembers(const char * data)
 	for (auto client : _members)
 	{
 		client->GetTcpSock().Send(data);
+
+		// 만약 채팅치고 있는 클라였다면 쳤던거 화면에 다시 뿌리기
+		if (client->GetTcpSock().GetTotalBuf().size() != 0)
+		{
+			string chatData = client->GetTcpSock().GetTotalBuf();
+			client->GetTcpSock().Send(chatData.c_str());
+		}
 	}
 }
 

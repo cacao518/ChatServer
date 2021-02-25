@@ -1,3 +1,19 @@
-﻿  Session.cpp
-  ChatServer.vcxproj -> C:\Users\byeongjun\source\repos\ChatServer\x64\Debug\ChatServer.exe
-  ChatServer.vcxproj -> C:\Users\byeongjun\source\repos\ChatServer\x64\Debug\ChatServer.pdb (Full PDB)
+﻿  PacketProcessor.cpp
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(37): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(38): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(39): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(40): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(238): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Room.cpp
+  RoomManager.cpp
+c:\users\qudwn\chatserver\chatserver\roommanager.cpp(68): warning C4456: 'name' 선언은 이전 로컬 선언을 숨깁니다.
+  c:\users\qudwn\chatserver\chatserver\roommanager.cpp(55): note: 'name' 선언을 참조하십시오.
+c:\users\qudwn\chatserver\chatserver\roommanager.cpp(93): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  ServerContext.cpp
+  Session.cpp
+  SessionManager.cpp
+  main.cpp
+  코드를 생성하고 있습니다...
+c:\users\qudwn\chatserver\chatserver\sessionmanager.cpp(99): warning C4701: 초기화되지 않았을 수 있는 'id' 지역 변수를 사용했습니다.
+c:\users\qudwn\chatserver\chatserver\sessionmanager.cpp(99): warning C4701: 초기화되지 않았을 수 있는 'curRoomID' 지역 변수를 사용했습니다.
+  ChatServer.vcxproj -> C:\Users\qudwn\ChatServer\x64\Debug\ChatServer.exe

@@ -70,11 +70,15 @@ BOOL ServerContext::Run()
 
 		for (auto it : clients)
 		{
-			// 엔터 or 백스페이스, 방향키 시 쓰기 셋에 추가
-			//if ( KeyCheck( it->GetTcpSock().GetBuf() ) == true )
-			//if(it->GetTcpSock().GetBuf() == '\n' || it->GetTcpSock().GetBuf() == '\b')
-			if(KeyCheck(it->GetTcpSock().GetBuf()))
+			// 한글, 영어, 숫자 등 입력 값 빼고 특수 키는 모두 wset에 추가하기
+			if (KeyCheck(it->GetTcpSock().GetBuf()) == TRUE)
+			{
 				FD_SET(it->GetSock(), &wset);
+				if(it->GetTcpSock().GetBuf() != '\n' && 
+					it->GetTcpSock().GetBuf() != '\r' && 
+					it->GetTcpSock().GetBuf() != '\b')
+					it->StartBufLimit();
+			}
 			else
 				FD_SET(it->GetSock(), &rset);
 		}
@@ -111,27 +115,10 @@ void ServerContext::Close()
 
 BOOL ServerContext::KeyCheck(char buf)
 {
-	if (buf == 27 ||
-		buf == 17 || 
-		buf == 91 || 
-		buf == 18 || 
-		buf == 20 || 
-		buf == 8 ||
-		buf == 13 || // 엔터
-		buf == 9 ||  // 백스페이스
-		buf == 21 || 
-		buf == 92 ||
-		buf == 93 ||
-		buf == 25 ||
-		buf == 45 ||
-		buf == 46 ||
-		(buf >= 33 && buf <= 36) ||
-		(buf >= 37 && buf <= 40) ||
-		(buf >= 112 && buf <= 123) || 
-		(buf >= 37 && buf <= 40))
-	{
-		return TRUE;
-	}
+	if (buf == '\0' || buf == '\r') return FALSE;	// 버퍼기본상태, 엔터키 앞부분
+	if (buf >= 32 && buf <= 126) return FALSE;		// 영어,숫자,기본특수문자 
+	if (buf & 0x80) return FALSE;					// 한글체크 
 
-	return FALSE;
+	// 나머지 특수키들 
+	return TRUE;
 }
