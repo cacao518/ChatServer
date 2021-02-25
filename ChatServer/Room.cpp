@@ -32,7 +32,7 @@ void Room::EnterRoom(Session * sess)
 	string message = "\r\n			< " + _info._roomName + " > \r\n";
 	sess->GetTcpSock().Send(message.c_str());
 
-	message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 " + "입장하셨습니다.\r\n\n입력> \0";
+	message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 입장하셨습니다.\r\n\n입력> \0";
 	SendAllToRoomMembers(message.c_str());
 }
 
@@ -44,8 +44,20 @@ void Room::LeaveRoom(Session * sess)
 	
 	_members.erase(sess);
 
-	string message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 " + "나갔습니다.\r\n\n입력> \0";
+	string message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 나갔습니다.\r\n\n입력> \0";
 	SendAllToRoomMembers(message.c_str());
+
+	// 나간 사람이 방장이라면 방에 남아있는 사람으로 방장 위임
+	if (_master == sess)
+	{
+		auto iter = _members.begin();
+		if (iter != _members.end())
+		{
+			SetMaster((*iter));
+			string message = "\r\n		 * " + (*iter)->GetPlayerInfo().name + "님으로 방장이 위임되었습니다. \r\n\n입력> \0";
+			SendAllToRoomMembers(message.c_str());
+		}
+	}
 
 	// 방에 아무도 없으면 방을 파괴한다. (단, 로비가 아니어야 함)
 	if (_members.size() == 0 && _info._isLobby == false) 

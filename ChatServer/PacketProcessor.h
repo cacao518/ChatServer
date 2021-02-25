@@ -23,6 +23,7 @@ public:
 	BOOL GotWhisper(Session* sess, const char* data);
 	BOOL GotMakeRoom(Session* sess, const char* data);
 	BOOL GotJoinRoom(Session* sess, const char* data);
+	BOOL GotKick(Session* sess, const char* data);
 
 	void Chat(Session* sess);
 	void SendWarningMessage(Session* sess);

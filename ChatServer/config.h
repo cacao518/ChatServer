@@ -18,6 +18,7 @@ enum class PacketKind {
 	Whisper,			//		귓속말 : /w 이름 
 	MakeRoom,			//		방만들기 : /make 최대인원 방제목
 	JoinRoom,			//		방 참여 : /join 방번호  
+	Kick,				//		강퇴(방장만가능) : /kick 이름
 	End
 };
 

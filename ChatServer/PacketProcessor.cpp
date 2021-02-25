@@ -30,6 +30,7 @@ PacketProceessor::PacketProceessor()
 	_command.push_back("/w ");
 	_command.push_back("/make ");
 	_command.push_back("/join ");
+	_command.push_back("/kick ");
 
 	// 리시브 핸들러 함수 등록
 	_packetHandleMap[PacketKind::Login] = [this](Session* sess, const char* data) { return GotLogin(sess, data); };
@@ -42,9 +43,11 @@ PacketProceessor::PacketProceessor()
 	_packetHandleMap[PacketKind::Whisper] = [this](Session* sess, const char* data) { return GotWhisper(sess, data); };
 	_packetHandleMap[PacketKind::JoinRoom] = [this](Session* sess, const char* data) { return GotJoinRoom(sess, data); };
 	_packetHandleMap[PacketKind::MakeRoom] = [this](Session* sess, const char* data) { return GotMakeRoom(sess, data); };
+	_packetHandleMap[PacketKind::Kick] = [this](Session* sess, const char* data) { return GotKick(sess, data); };
 }
 
-/// 세션이 리시브를 하고 난 다음에 이 함수를 실행하여 핸들러를 실행한다.
+/// 세션이 리시브를 하고 난 다음에 이 함수가 실행된다.
+/// 만약 세션으로부터 받은 문자중에 명령어 문자열이 앞부분에 존재한다면 명령어에 따른 핸들러를 실행한다.
 BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
 {
 	if (sess == nullptr) return FALSE;
@@ -64,9 +67,9 @@ BOOL PacketProceessor::PacketProcess(Session* sess, const char* data)
 			str.erase(str.size() - 2, str.size());
 			pkKind = (PacketKind)i;
 
-			// (3) 커맨드(패킷)에 해당하는 함수 실행
-			if(_packetHandleMap[pkKind](sess, str.c_str()) == FALSE) 
-				SendWarningMessage(sess);
+			// (3) 커맨드(패킷)에 해당하는 함수 실행, 분리한 데이터를 넘겨준다.
+			if(_packetHandleMap[pkKind](sess, str.c_str()) == FALSE)
+				SendWarningMessage(sess); // 명령어 수행에 실패하면 오류 메세지를 송신한다.
 
 			return TRUE;
 		}
@@ -113,6 +116,7 @@ BOOL PacketProceessor::GotHelp(Session * sess)
 	message.append("/w [아이디] [메시지]	: 귓속말\r\n");
 	message.append("/make [방제목]		: 방 생성\r\n");
 	message.append("/join [방번호]		: 방 참가\r\n");
+	message.append("/kick [아이디]		: 유저 내보내기 (방장만 가능)\r\n");
 	message.append("/exit			: 나가기\r\n");
 	message.append("=========================================================\r\n");
 	message.append("\r\n입력> ");
@@ -199,7 +203,7 @@ BOOL PacketProceessor::GotWhisper(Session * sess, const char * data)
 	// (1) 받은 문자가 맨앞보다 뒤에 위치한다면...
 	if (range > 0)
 	{
-		// (2) 아이디 + 내용 
+		// (2) 아이디 + 내용 잘라내기
 		recvClientName = recvClientName.substr(0, range);
 		sendData = sendData.substr(range + 1, sendData.size());
 	}
@@ -270,6 +274,38 @@ BOOL PacketProceessor::GotJoinRoom(Session * sess, const char * data)
 	sess->GetCurRoom()->LeaveRoom(sess);					// 이전 방 나가기
 	sess->SetCurRoom(room);									// 새로운 방으로 설정
 	(*roomIter).second->EnterRoom(sess);					// 새로운 방 입장
+
+	return TRUE;
+}
+
+BOOL PacketProceessor::GotKick(Session * sess, const char * data)
+{
+	//방장이 아니면 명령어 사용 불가
+	if (sess->GetCurRoom()->GetMaster() != sess) return FALSE;
+
+	string name(data);
+	Session* kickedUser = nullptr;
+
+	bool isFindSuccess = false;
+	for (auto client : sess->GetCurRoom()->GetMembers()) // 같은 방에 있는 사람들 순회
+	{
+		if (client->GetPlayerInfo().name == name) // 내보내려 하는 사람을 찾았다면
+		{
+			if (client->GetIsLogin() == false) return FALSE; // 로그인 되있는지 체크
+			kickedUser = client;		// 강퇴할 세션 주소 획득
+			isFindSuccess = true;
+			break;
+		}
+	}
+	if (name == sess->GetPlayerInfo().name) return FALSE;	 // 자기 자신 추방은 안돼.
+	if (isFindSuccess == false) return FALSE;				// 강퇴할 대상 탐색 실패
+
+	string message = "\r\n		 * " + kickedUser->GetPlayerInfo().name + "님이 추방당했습니다. \r\n\n입력> \0";
+	sess->GetCurRoom()->SendAllToRoomMembers(message.c_str());
+
+	kickedUser->GetCurRoom()->LeaveRoom(kickedUser);			// 이전 방 나가게 하기
+	kickedUser->SetCurRoom(_roomMgr->GetRooms()[1]);			// 현재 방 로비로 셋팅
+	_roomMgr->GetRooms()[1]->EnterRoom(kickedUser);				// 로비방 입장 (로비 인덱스 = 1)
 
 	return TRUE;
 }

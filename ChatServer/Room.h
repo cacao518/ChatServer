@@ -17,6 +17,7 @@ public:
 	RoomInfo		GetRoomInfo() const { return _info; }
 	set<Session*>&	GetMembers() { return _members; };
 	Session*		GetMaster() const { return _master; }
+	void			SetMaster(Session* sess) { _master = sess; };		// 방장 권한 위임
 
 private:
 	RoomInfo		_info;			// 방정보(고유번호,이름,최대인원,로비여부)

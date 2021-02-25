@@ -2,12 +2,6 @@
 #include "TcpSocket.h"
 #include "Session.h"
 
-///////////////////////////////////
-/// @brief 무슨 함수 ㅇㄴㅁㅇㅁㄴ
-///
-///	@param	sock	뭐하는 변수
-///	@param	sock	뭐하는 변수
-//////////////////////////////////
 SessionManager* SessionManager::instance = nullptr;
 
 SessionManager* SessionManager::GetInstance()
@@ -19,6 +13,7 @@ SessionManager* SessionManager::GetInstance()
 
 }
 
+/// 세션(클라이언트) 추가
 Session* SessionManager::AddSession(SOCKET sock)
 {
 	if (_clients.size() >= FD_SETSIZE) {
@@ -41,6 +36,7 @@ Session* SessionManager::AddSession(SOCKET sock)
 }
 
 
+/// 세션(클라이언트) 제거
 void SessionManager::RemoveSession(Session* client)
 {
 	if (_clients.empty()) return;
@@ -72,9 +68,10 @@ void SessionManager::RemoveSession(Session* client)
 	_clients.erase(client);
 
 	client->SetIsExit(true);
-	delete ptr;
+	delete ptr; // 메모리 해제
 }
 
+/// 선택한 유저 정보 보기
 BOOL SessionManager::ShowUserInfo(Session * sess, string name)
 {
 	UINT id;
@@ -108,6 +105,7 @@ BOOL SessionManager::ShowUserInfo(Session * sess, string name)
 	return TRUE;
 }
 
+/// 모든 유저 리스트 보기
 void SessionManager::ShowUserList(Session * sess)
 {
 	string message = "=========================================================\r\n		전체 유저 목록 \r\n=========================================================\r\n";
