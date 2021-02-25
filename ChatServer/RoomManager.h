@@ -22,9 +22,9 @@ public:
 
 public:
 	unordered_map<int, Room*>& GetRooms() { return _rooms; }
-	int GetNewCode() { return _roomCode++; }
+	int GetNewRoomID() { return _roomID++; }
 
 private:
-	int _roomCode = 0;												/// 방 고유번호
+	int _roomID = 0;												/// 방 고유번호
 	unordered_map<int, Room*> _rooms;								/// 모든 방
 };

@@ -3,8 +3,8 @@ c:\users\byeongjun\source\repos\chatserver\chatserver\packetprocessor.cpp(34): w
 c:\users\byeongjun\source\repos\chatserver\chatserver\packetprocessor.cpp(35): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
 c:\users\byeongjun\source\repos\chatserver\chatserver\packetprocessor.cpp(36): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
 c:\users\byeongjun\source\repos\chatserver\chatserver\packetprocessor.cpp(37): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
-c:\users\byeongjun\source\repos\chatserver\chatserver\packetprocessor.cpp(118): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
-c:\users\byeongjun\source\repos\chatserver\chatserver\packetprocessor.cpp(124): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
-c:\users\byeongjun\source\repos\chatserver\chatserver\packetprocessor.cpp(130): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\byeongjun\source\repos\chatserver\chatserver\packetprocessor.cpp(142): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\byeongjun\source\repos\chatserver\chatserver\packetprocessor.cpp(148): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\byeongjun\source\repos\chatserver\chatserver\packetprocessor.cpp(154): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
   ChatServer.vcxproj -> C:\Users\byeongjun\source\repos\ChatServer\x64\Debug\ChatServer.exe
   ChatServer.vcxproj -> C:\Users\byeongjun\source\repos\ChatServer\x64\Debug\ChatServer.pdb (Full PDB)

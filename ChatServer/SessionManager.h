@@ -20,9 +20,9 @@ public:
 
 public:
 	set<Session*>&	GetClients() { return _clients; };
-	int				GetNewCode() { return _code++; }
+	int				GetNewSessID() { return _sessID++; }
 
 private:
-	int				_code = 0;		/// 세션 고유 번호
+	int				_sessID = 0;		/// 세션 고유 번호
 	set<Session*>	_clients;		/// 세션(클라이언트) set
 };

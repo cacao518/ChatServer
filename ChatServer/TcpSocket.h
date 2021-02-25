@@ -36,9 +36,9 @@ public:
 	string			GetIPAddress(); // 아이피 주소(숫자)를 반환
 	int				GetPort(); // 포트번호(숫자)를 반환
 
-	void			SetBuf(const char buf) { this->_buf = buf; }
+	void			SetBuf(const char& buf) { this->_buf = buf; }
 	void			SetSocket(const SOCKET sock) { this->_sock = sock; }
-	void			SetRecvBytes(const int recvbytes) { this->_recvbytes = recvbytes; }
+	void			SetRecvBytes(const int& recvbytes) { this->_recvbytes = recvbytes; }
 	void			SetSession(Session* sess) { this->_parent = sess; };
 
 private:

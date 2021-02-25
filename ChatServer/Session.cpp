@@ -36,7 +36,7 @@ BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 	return TRUE;
 }
 
-void Session::SetPlayerInfo(PlayerInfo info)
+void Session::SetPlayerInfo(const PlayerInfo& info)
 {
 	_info.code = info.code;
 	_info.name = info.name;

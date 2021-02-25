@@ -14,7 +14,7 @@ RoomManager* RoomManager::GetInstance()
 
 Room* RoomManager::AddRoom(Session* master, int max, string name)
 {
-	int n = GetNewCode();
+	int n = GetNewRoomID();
 
 	if (master == nullptr)
 		_rooms[n] = new Room(n); // ·Îºñ

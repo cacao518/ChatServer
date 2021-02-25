@@ -45,7 +45,7 @@ BOOL ServerContext::Accept(TcpSocket& client_sock, FD_SET& rset)
 			// 소켓을 세션으로 추가
 			_sessMgr->AddSession(client_sock.GetSocket());
 
-			string message = "		* 명령어를 사용해서 로그인하세요. ( /login 아이디 ) \r\n\n입력> \0";
+			string message = "		* 명령어를 사용해서 로그인하세요. ( /login 아이디 ) \r\n\n입력> ";
 			client_sock.Send(message.c_str());
 		}
 	}

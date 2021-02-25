@@ -19,8 +19,8 @@ public:
 	bool		GetIsLogin() { return _isLogin; };
 	PlayerInfo	GetPlayerInfo() { return _info; }
 	Room*		GetCurRoom() { return _curRoom; }
-	void		SetIsLogin(bool isLogin) { _isLogin = isLogin; };
-	void		SetPlayerInfo(PlayerInfo info);
+	void		SetIsLogin(const bool& isLogin) { _isLogin = isLogin; };
+	void		SetPlayerInfo(const PlayerInfo& info);
 	void		SetCurRoom(Room* parent) { _curRoom = parent; }
 
 private:

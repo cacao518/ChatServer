@@ -79,11 +79,11 @@ void PacketProceessor::GotLogin(Session* sess, const char* data)
 	// 로그인이 되어있으면 사용 불가능
 	if (sess->GetIsLogin() == true) return;
 
-	string message = "=========================================================\r\n	로그인 되었습니다.\r\n(도움말 : /help   나가기 : /exit)\r\n=========================================================\r\n";
+	string message = "=========================================================\r\n		로그인되었습니다.\r\n\r\n(도움말 : /help   나가기 : /exit)\r\n=========================================================\r\n";
 	sess->GetTcpSock().Send(message.c_str());
 
-	sess->SetPlayerInfo( PlayerInfo{ _sessMgr->GetNewCode(), data } );		// 로그인한 세션 정보 셋팅 ( 고유번호, 아이디 )
-	sess->SetCurRoom(_roomMgr->GetRooms()[0]);								// 세션 부모(입장한 방) 셋팅
+	sess->SetPlayerInfo( PlayerInfo{ _sessMgr->GetNewSessID(), data } );		// 로그인한 세션 정보 셋팅 ( 고유번호, 아이디 )
+	sess->SetCurRoom(_roomMgr->GetRooms()[0]);								// 현재 방 로비로 셋팅
 	_roomMgr->GetRooms()[0]->EnterRoom(sess);								// 로비방 입장 (로비 인덱스 = 0)
 
 	sess->SetIsLogin(true);
@@ -94,6 +94,21 @@ void PacketProceessor::GotHelp(Session * sess)
 	// 로그인이 안되어있으면 사용 불가능
 	if (sess->GetIsLogin() == false) return;
 
+	string message = "=========================================================\r\n";
+	message.append("		*	도움말		*		\r\n");
+	message.append("=========================================================\r\n");
+	message.append("/help			: 도움말\r\n");
+	message.append("/all user		: 모든 유저 보기\r\n");
+	message.append("/all room		: 모든 방 보기\r\n");
+	message.append("/r [방번호]		: 방 정보 보기\r\n");
+	message.append("/i [아이디]		: 유저 정보 보기\r\n");
+	message.append("/w [아이디] [메시지]	: 귓속말\r\n");
+	message.append("/make [방제목]		: 방 생성\r\n");
+	message.append("/join [방번호]		: 방 참가\r\n");
+	message.append("/exit			: 나가기\r\n");
+	message.append("=========================================================\r\n");
+	message.append("\r\n입력> ");
+	sess->GetTcpSock().Send(message.c_str());
 }
 
 void PacketProceessor::GotExit(Session * sess)
@@ -101,6 +116,15 @@ void PacketProceessor::GotExit(Session * sess)
 	// 로그인이 안되어있으면 사용 불가능
 	if (sess->GetIsLogin() == false) return;
 
+	// 현재 방이 로비일 경우
+	if (sess->GetCurRoom()->GetRoomInfo()._isLobby == true)
+		sess->GetCurRoom()->LeaveRoom(sess);					// 접속 종료
+	else // 일반 방 나가기 (로비로 복귀)
+	{
+		sess->GetCurRoom()->LeaveRoom(sess);					// 이전 방 나가기
+		sess->SetCurRoom(_roomMgr->GetRooms()[0]);				// 현재 방 로비로 셋팅
+		_roomMgr->GetRooms()[0]->EnterRoom(sess);				// 로비방 입장 (로비 인덱스 = 0)
+	}
 }
 
 void PacketProceessor::GotShowRoom(Session * sess)
