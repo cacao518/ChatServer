@@ -46,7 +46,7 @@ BOOL ServerContext::Accept(TcpSocket& client_sock, FD_SET& rset)
 			_sessMgr->AddSession(client_sock.GetSocket());
 
 			string message = "		* 명령어를 사용해서 로그인하세요. ( /login 아이디 ) \r\n\n입력> \0";
-			client_sock.Send(message.c_str(), strlen(message.c_str()));
+			client_sock.Send(message.c_str());
 		}
 	}
 	return TRUE;

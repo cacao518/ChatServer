@@ -57,12 +57,15 @@ void SessionManager::RemoveSession(Session* client)
 	printf("[TCP 서버] 클라이언트 종료: IP 주소=%s, 포트 번호=%d\n",
 		inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
-	// Room에 있는 member에서 제거하고, 방에 있는 사람들에게 알리기
-	ptr->GetCurRoom()->LeaveRoom(client);
+	if (ptr->GetCurRoom() != nullptr)
+	{
+		// Room에 있는 member에서 제거하고, 방에 있는 사람들에게 알리기
+		ptr->GetCurRoom()->LeaveRoom(client);
 
-	// 접속종료 메시지 방에 있는 사람들에게 출력
-	string message = "\r\n		 * " + client->GetPlayerInfo().name + "님이 " + "접속을 종료했습니다.\r\n\n입력> \0";
-	ptr->GetCurRoom()->SendAllToRoomMembers(message.c_str());
+		// 접속종료 메시지 방에 있는 사람들에게 출력
+		string message = "\r\n		 * " + client->GetPlayerInfo().name + "님이 " + "접속을 종료했습니다.\r\n\n입력> \0";
+		ptr->GetCurRoom()->SendAllToRoomMembers(message.c_str());
+	}
 
 	// 소켓 닫기
 	closesocket(ptr->GetSock());

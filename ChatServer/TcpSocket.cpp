@@ -66,7 +66,7 @@ int TcpSocket::Accept(TcpSocket & acceptedSocket)
 	return sock;
 }
 
-BOOL TcpSocket::Send(const char * data, int length)
+BOOL TcpSocket::Send(const char * data)
 {
 	int retval = send(_sock, data, strlen(data), 0);
 

@@ -30,7 +30,7 @@ void Room::EnterRoom(Session * sess)
 	_members.insert(sess);
 
 	string message = "\r\n			< " + _info._roomName + " > \r\n";
-	sess->GetTcpSock().Send(message.c_str(), strlen(message.c_str()));
+	sess->GetTcpSock().Send(message.c_str());
 
 	message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 " + "입장하셨습니다.\r\n\n입력> \0";
 	SendAllToRoomMembers(message.c_str());
@@ -59,7 +59,7 @@ void Room::SendData(Session * sess, const char * data)
 	{
 		// 채팅을 보낸 클라이언트는 제외
 		if (client->GetSock() == sess->GetSock()) continue;
-		client->GetTcpSock().Send(data, strlen(data));
+		client->GetTcpSock().Send(data);
 	}
 }
 
@@ -67,7 +67,7 @@ void Room::SendAllToRoomMembers(const char * data)
 {
 	for (auto client : _members)
 	{
-		client->GetTcpSock().Send(data, strlen(data));
+		client->GetTcpSock().Send(data);
 	}
 }
 
