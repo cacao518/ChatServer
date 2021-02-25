@@ -7,6 +7,7 @@ TcpSocket::TcpSocket()
 
 TcpSocket::TcpSocket(SocketType socketType, IPType ipType)
 {
+	_buf = '\0';
 	// 윈속 초기화
 	WSADATA wsa;
 	WSAStartup(MAKEWORD(2, 2), &wsa);

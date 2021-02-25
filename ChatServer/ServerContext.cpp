@@ -71,7 +71,9 @@ BOOL ServerContext::Run()
 		for (auto it : clients)
 		{
 			// 엔터 or 백스페이스, 방향키 시 쓰기 셋에 추가
-			if (it->GetTcpSock().GetBuf() == '\n' || it->GetTcpSock().GetBuf() == '\b')
+			//if ( KeyCheck( it->GetTcpSock().GetBuf() ) == true )
+			//if(it->GetTcpSock().GetBuf() == '\n' || it->GetTcpSock().GetBuf() == '\b')
+			if(KeyCheck(it->GetTcpSock().GetBuf()))
 				FD_SET(it->GetSock(), &wset);
 			else
 				FD_SET(it->GetSock(), &rset);
@@ -105,4 +107,31 @@ void ServerContext::Close()
 
 	clients.clear();
 	WSACleanup();
+}
+
+BOOL ServerContext::KeyCheck(char buf)
+{
+	if (buf == 27 ||
+		buf == 17 || 
+		buf == 91 || 
+		buf == 18 || 
+		buf == 20 || 
+		buf == 8 ||
+		buf == 13 || // 엔터
+		buf == 9 ||  // 백스페이스
+		buf == 21 || 
+		buf == 92 ||
+		buf == 93 ||
+		buf == 25 ||
+		buf == 45 ||
+		buf == 46 ||
+		(buf >= 33 && buf <= 36) ||
+		(buf >= 37 && buf <= 40) ||
+		(buf >= 112 && buf <= 123) || 
+		(buf >= 37 && buf <= 40))
+	{
+		return TRUE;
+	}
+
+	return FALSE;
 }

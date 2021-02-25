@@ -22,11 +22,12 @@ BOOL Session::Run(FD_SET& rset, FD_SET& wset)
 		GetTcpSock().GetTotalBuf().push_back(GetTcpSock().GetBuf());
 	}
 
-	// 엔터/백스페이스 치면 아래줄 활성화
+	// 특수키 치면 아래줄 활성화
 	if (FD_ISSET(GetSock(), &wset)) // 보내기
 	{	
-		// 백스페이스 시전시 내용 다 비우기
-		if (_socket.GetBuf() == '\b')
+		// 엔터가 아닌 특수키는 다 버퍼 비우게 하기
+		//if (_socket.GetBuf() == '\b')
+		if (_socket.GetBuf() != 13)
 		{
 			// 버퍼 비우기
 			_socket.SetBuf('\0');

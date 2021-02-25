@@ -24,6 +24,8 @@ public:
 	BOOL Run();
 	void Close();
 
+	BOOL KeyCheck(char buf);
+
 private:
 	TcpSocket		_listenSock;
 
