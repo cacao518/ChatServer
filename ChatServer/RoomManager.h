@@ -14,7 +14,9 @@ class Room;
 */
 
 class RoomManager {
-	static RoomManager* instance;
+
+	typedef unordered_map<UINT, Room*> RoomMap;
+
 public:
 	static RoomManager* GetInstance();
 
@@ -31,6 +33,7 @@ public:
 	UINT GetNewRoomID() { return ++_roomID; }
 
 private:
-	UINT _roomID = 0;									// 방 고유번호
-	unordered_map<UINT, Room*> _rooms;					// 모든 방 (key:id, value:Room 포인터)
+	static RoomManager* instance;
+	UINT _roomID = 0;						// 방 고유번호
+	RoomMap _rooms;							// 모든 방 (key:id, value:Room 포인터)
 };

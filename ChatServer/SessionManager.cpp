@@ -6,7 +6,7 @@ SessionManager* SessionManager::instance = nullptr;
 
 SessionManager* SessionManager::GetInstance()
 {
-	if (instance == NULL)
+	if (instance == nullptr)
 		instance = new SessionManager();
 
 	return instance;

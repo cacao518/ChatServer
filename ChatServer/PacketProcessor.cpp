@@ -7,7 +7,7 @@ PacketProceessor* PacketProceessor::instance = nullptr;
 
 PacketProceessor * PacketProceessor::GetInstance()
 {
-	if (instance == NULL)
+	if (instance == nullptr)
 		instance = new PacketProceessor();
 
 	return instance;

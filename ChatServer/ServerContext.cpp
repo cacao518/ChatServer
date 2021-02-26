@@ -83,7 +83,7 @@ BOOL ServerContext::Run()
 				FD_SET(it->GetSock(), &rset);
 		}
 
-		// select()
+		// select1
 		if (select(0, &rset, &wset, NULL, NULL) == SOCKET_ERROR) 
 			ErrorUtil::err_quit("select()");
 
@@ -107,6 +107,7 @@ void ServerContext::Close()
 	for (auto client : clients)
 	{
 		delete client;
+		client = nullptr;
 	}
 
 	clients.clear();

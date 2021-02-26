@@ -18,9 +18,9 @@ public:
 
 	////////////////////////////////////
 
-	bool		GetIsLogin() { return _isLogin; };
+	bool		GetIsLogin() const { return _isLogin; };
 	PlayerInfo	GetPlayerInfo() { return _info; }
-	Room*		GetCurRoom() { return _curRoom; }
+	Room*		GetCurRoom() const { return _curRoom; }
 	void		SetIsLogin(const bool& isLogin) { _isLogin = isLogin; };
 	void		SetIsExit(const bool& isExit) { _isExit = isExit; };
 	void		SetPlayerInfo(const PlayerInfo& info);

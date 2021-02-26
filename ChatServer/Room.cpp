@@ -15,7 +15,7 @@ Room::Room(UINT roomCode)
 /// 로비가 아닌 일반 방 생성
 Room::Room(Session * master, UINT roomCode, int max, string name)
 {
-	this->_master = master;
+	_master = master;
 
 	_info._isLobby = false;
 	_info._roomID = roomCode;

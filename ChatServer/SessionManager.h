@@ -14,7 +14,9 @@ class Session;
 */
 
 class SessionManager {
-	static SessionManager* instance;		
+		
+	typedef set<Session*> SessionSet;
+
 public:
 	static SessionManager* GetInstance();
 
@@ -29,6 +31,7 @@ public:
 	UINT				GetNewSessID() { return ++_sessID; }
 
 private:
+	static SessionManager* instance;
 	UINT			_sessID = 0;		// 세션 고유 번호
-	set<Session*>	_clients;		   // 세션(클라이언트) set
+	SessionSet	_clients;		   // 세션(클라이언트) set
 };

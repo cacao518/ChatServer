@@ -5,9 +5,9 @@ RoomManager* RoomManager::instance = nullptr;
 
 RoomManager* RoomManager::GetInstance()
 {
-	if (instance == NULL)
+	if (instance == nullptr)
 		instance = new RoomManager();
-
+	
 	return instance;
 
 }

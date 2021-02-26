@@ -10,7 +10,7 @@
 
 class PacketProceessor {
 
-	static PacketProceessor* instance;
+	typedef set<string> CommnadString;
 public:
 	static PacketProceessor* GetInstance();
 
@@ -37,7 +37,9 @@ public:
 	unordered_map<PacketKind, PacketHandler> _packetHandleMap;		/// 핸들러 함수 집합 (key:패킷종류, value:함수)
 
 private:
-	vector<string> _command;	/// 명령어 string 집합
+	static PacketProceessor* instance;
+	vector<string> _command;
+	//set<string> _command;	/// 명령어 string 집합
 	RoomManager*	_roomMgr;	/// 룸 매니저
 	SessionManager* _sessMgr;	/// 세션 매니저
 };
