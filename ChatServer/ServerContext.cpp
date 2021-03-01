@@ -1,4 +1,4 @@
-#include "ServerContext.h"
+ï»¿#include "ServerContext.h"
 #include "Session.h"
 #include "SessionManager.h"
 #include "RoomManager.h"
@@ -22,8 +22,8 @@ BOOL ServerContext::Init(int port)
 	_listenSock.Bind(EndPoint("", port, IPType::IPv4));
 	_listenSock.Listen();
 
-	printf("%s", " [ Telnet Ã¤ÆÃ ¼­¹ö ]\n");
-	printf("%s", " * Telnet Client Á¢¼ÓÀ» ±â´Ù¸®°í ÀÖ½À´Ï´Ù. (Port:9000)\n");
+	printf("%s", " [ Telnet ì±„íŒ… ì„œë²„ ]\n");
+	printf("%s", " * Telnet Client ì ‘ì†ì„ ê¸°ë‹¤ë¦¬ê³  ìžˆìŠµë‹ˆë‹¤. (Port:9000)\n");
 	return TRUE;
 }
 
@@ -39,13 +39,17 @@ BOOL ServerContext::Accept(TcpSocket& client_sock, FD_SET& rset)
 		}
 		else
 		{
-			printf("\n[TCP ¼­¹ö] Å¬¶óÀÌ¾ðÆ® Á¢¼Ó: IP ÁÖ¼Ò=%s, Æ÷Æ® ¹øÈ£=%d\n", 
+			if (_sessMgr->GetClients().size() >= USER_NUM_MAX)
+			{
+				return FALSE;
+			}
+			printf("\n[TCP ì„œë²„] í´ë¼ì´ì–¸íŠ¸ ì ‘ì†: IP ì£¼ì†Œ=%s, í¬íŠ¸ ë²ˆí˜¸=%d\n", 
 				client_sock.GetIPAddress().c_str(), client_sock.GetPort());
 
-			// ¼ÒÄÏÀ» ¼¼¼ÇÀ¸·Î Ãß°¡
+			// ì†Œì¼“ì„ ì„¸ì…˜ìœ¼ë¡œ ì¶”ê°€
 			_sessMgr->AddSession(client_sock.GetSocket());
 
-			string message = "		* ¸í·É¾î¸¦ »ç¿ëÇØ¼­ ·Î±×ÀÎÇÏ¼¼¿ä. ( /login ¾ÆÀÌµð ) \r\n\nÀÔ·Â> ";
+			string message = "		* ëª…ë ¹ì–´ë¥¼ ì‚¬ìš©í•´ì„œ ë¡œê·¸ì¸í•˜ì„¸ìš”. ( /login ì•„ì´ë”” ) \r\n\nìž…ë ¥> ";
 			client_sock.Send(message.c_str());
 		}
 	}
@@ -55,22 +59,22 @@ BOOL ServerContext::Accept(TcpSocket& client_sock, FD_SET& rset)
 BOOL ServerContext::Run()
 {
 	set<Session*>& clients = _sessMgr->GetClients();
-	_roomMgr->AddRoom(nullptr, ROOM_USER_MAX, "Lobby"); // ·Îºñ »ý¼º
+	_roomMgr->AddRoom(nullptr, ROOM_USER_MAX, "Lobby"); // ë¡œë¹„ ìƒì„±
 
-	// µ¥ÀÌÅÍ Åë½Å¿¡ »ç¿ëÇÒ º¯¼ö
+	// ë°ì´í„° í†µì‹ ì— ì‚¬ìš©í•  ë³€ìˆ˜
 	FD_SET rset, wset;
 	TcpSocket client_socket;
 
 	while (1)
 	{
-		// ¼ÒÄÏ ¼Â ÃÊ±âÈ­
+		// ì†Œì¼“ ì…‹ ì´ˆê¸°í™”
 		FD_ZERO(&rset);
 		FD_ZERO(&wset);
 		FD_SET(_listenSock.GetSocket(), &rset);
 
 		for (auto it : clients)
 		{
-			// ÇÑ±Û, ¿µ¾î, ¼ýÀÚ µî ÀÔ·Â °ª »©°í Æ¯¼ö Å°´Â ¸ðµÎ wset¿¡ Ãß°¡ÇÏ±â
+			// í•œê¸€, ì˜ì–´, ìˆ«ìž ë“± ìž…ë ¥ ê°’ ë¹¼ê³  íŠ¹ìˆ˜ í‚¤ëŠ” ëª¨ë‘ wsetì— ì¶”ê°€í•˜ê¸°
 			if (KeyCheck(it->GetTcpSock().GetBuf()) == TRUE)
 			{
 				FD_SET(it->GetSock(), &wset);
@@ -87,10 +91,10 @@ BOOL ServerContext::Run()
 		if (select(0, &rset, &wset, NULL, NULL) == SOCKET_ERROR) 
 			ErrorUtil::err_quit("select()");
 
-		// (1) ¼¼¼Ç(Å¬¶óÀÌ¾ðÆ®) Á¢¼Ó ¼ö¿ë
+		// (1) ì„¸ì…˜(í´ë¼ì´ì–¸íŠ¸) ì ‘ì† ìˆ˜ìš©
 		Accept(client_socket, rset);
 
-		// (2) ¸ðµç ¼¼¼Çµé¿¡ ´ëÇØ¼­ FD_SET¿¡ ÇØ´ç ¼ÒÄÏÀÌ µé¾îÀÖ´Ù¸é ¹Þ±â/º¸³»±â ½ÇÇà
+		// (2) ëª¨ë“  ì„¸ì…˜ë“¤ì— ëŒ€í•´ì„œ FD_SETì— í•´ë‹¹ ì†Œì¼“ì´ ë“¤ì–´ìžˆë‹¤ë©´ ë°›ê¸°/ë³´ë‚´ê¸° ì‹¤í–‰
 		for (auto it : clients)
 		{
 			Session* se = it;
@@ -116,10 +120,10 @@ void ServerContext::Close()
 
 BOOL ServerContext::KeyCheck(char buf)
 {
-	if (buf == '\0' || buf == '\r') return FALSE;	// ¹öÆÛ±âº»»óÅÂ, ¿£ÅÍÅ° ¾ÕºÎºÐ
-	if (buf >= 32 && buf <= 126) return FALSE;		// ¿µ¾î,¼ýÀÚ,±âº»Æ¯¼ö¹®ÀÚ 
-	if (buf & 0x80) return FALSE;					// ÇÑ±ÛÃ¼Å© 
+	if (buf == '\0' || buf == '\r') return FALSE;	// ë²„í¼ê¸°ë³¸ìƒíƒœ, ì—”í„°í‚¤ ì•žë¶€ë¶„
+	if (buf >= 32 && buf <= 126) return FALSE;		// ì˜ì–´,ìˆ«ìž,ê¸°ë³¸íŠ¹ìˆ˜ë¬¸ìž 
+	if (buf & 0x80) return FALSE;					// í•œê¸€ì²´í¬ 
 
-	// ³ª¸ÓÁö Æ¯¼öÅ°µé 
+	// ë‚˜ë¨¸ì§€ íŠ¹ìˆ˜í‚¤ë“¤ 
 	return TRUE;
 }

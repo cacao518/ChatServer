@@ -40,7 +40,7 @@ Session* SessionManager::AddSession(SOCKET sock)
 void SessionManager::RemoveSession(Session* client)
 {
 	if (_clients.empty()) return;
-
+	if (_clients.find(client) == _clients.end()) return;
 	Session* ptr = *(_clients.find(client));
 	if (ptr == nullptr) return;
 

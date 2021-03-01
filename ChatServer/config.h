@@ -4,8 +4,8 @@ using namespace std;
 
 constexpr int SERVERPORT = 9000;
 constexpr int BUFSIZE = 512;
+constexpr int USER_NUM_MAX = 60;
 constexpr int ROOM_USER_MAX = 100;
-constexpr int USER_NUM_MAX = 50;
 constexpr int ROOM_NUM_MAX = 50;
 
 constexpr short BUF_LIMIT_COUNT = 1;
