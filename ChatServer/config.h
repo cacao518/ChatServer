@@ -14,6 +14,7 @@ enum class PacketKind {
 	Login,				//		로그인 : /login 닉네임
 	Help,				//		명령어 안내 : /help
 	Exit,				//		종료 : /exit
+	UnrealCheck,		//		언리얼 클라 체크
 	ShowUser,			//		전체 유저 출력 : /user
 	ShowRoom,			//		전체 방 출력 : /room
 	ShowRoomInfo,		//		선택 방 정보 출력 : /r 방번호

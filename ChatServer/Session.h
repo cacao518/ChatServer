@@ -19,12 +19,14 @@ public:
 	////////////////////////////////////
 
 	bool		GetIsLogin() const { return _isLogin; };
+	bool		GetIsUnreal() const { return _isUnreal; };
 	PlayerInfo	GetPlayerInfo() { return _info; }
 	Room*		GetCurRoom() const { return _curRoom; }
 	void		SetIsLogin(const bool& isLogin) { _isLogin = isLogin; };
 	void		SetIsExit(const bool& isExit) { _isExit = isExit; };
 	void		SetPlayerInfo(const PlayerInfo& info);
 	void		SetCurRoom(Room* parent) { _curRoom = parent; }
+	void		SetIsUnreal(const bool& isUnreal) { _isUnreal = isUnreal; }
 
 	void		StartBufLimit();			// 버퍼 담기 금지 시작
 	void		ReleaseBufLimit();			// 버퍼 담기 금지 해제 함수
@@ -37,6 +39,7 @@ private:
 	bool		_isLogin = false;					// 로그인 여부
 	bool		_isExit = false;					// 프로그램 종료 여부
 
+	bool		_isUnreal = false;					// 언리얼 클라로 접속했는지 여부
 	bool		_isBufLimit = false;				// 버퍼에 담을수 없는 상태
 	short		_ReleaseBufLimitCount = 0;			// 버퍼에 담을수 없는 상태 헤제 카운트 변수
 };

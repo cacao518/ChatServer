@@ -23,6 +23,7 @@ PacketProceessor::PacketProceessor()
 	_command.push_back("/login ");
 	_command.push_back("/help");
 	_command.push_back("/exit");
+	_command.push_back("나는야언리얼");
 	_command.push_back("/user");
 	_command.push_back("/room");
 	_command.push_back("/r ");
@@ -44,6 +45,7 @@ PacketProceessor::PacketProceessor()
 	_packetHandleMap[PacketKind::JoinRoom] = [this](Session* sess, const char* data) { return GotJoinRoom(sess, data); };
 	_packetHandleMap[PacketKind::MakeRoom] = [this](Session* sess, const char* data) { return GotMakeRoom(sess, data); };
 	_packetHandleMap[PacketKind::Kick] = [this](Session* sess, const char* data) { return GotKick(sess, data); };
+	_packetHandleMap[PacketKind::UnrealCheck] = [this](Session* sess, const char* data) { return GotUnrealCheck(sess, data); };
 }
 
 /// 세션이 리시브를 하고 난 다음에 이 함수가 실행된다.
@@ -115,8 +117,21 @@ BOOL PacketProceessor::GotLogin(Session* sess, const char* data)
 	string str(data);
 	if (str.find(" ") != string::npos) return FALSE;
 
-	string message = "=========================================================\r\n		로그인되었습니다.\r\n\r\n(도움말 : /help   나가기 : /exit)\r\n=========================================================\r\n";
-	sess->GetTcpSock().Send(message.c_str());
+	if (sess->GetIsUnreal())
+	{
+		char sendData[BUFSIZE];
+		*sendData = (char)PacketKind::Login;
+		string msg = "* 로그인에 성공했습니다.";
+		memcpy(sendData + 1, msg.c_str(), msg.size());
+		
+		sess->GetTcpSock().Send(sendData);
+	}
+	else
+	{
+		string message = "=========================================================\r\n		로그인되었습니다.\r\n\r\n(도움말 : /help   나가기 : /exit)\r\n=========================================================\r\n";
+		sess->GetTcpSock().Send(message.c_str());
+	}
+
 
 	// 버퍼 비우기
 	sess->GetTcpSock().SetBuf('\0');
@@ -360,6 +375,12 @@ BOOL PacketProceessor::GotKick(Session * sess, const char * data)
 	kickedUser->SetCurRoom(_roomMgr->GetRooms()[1]);			// 현재 방 로비로 셋팅
 	_roomMgr->GetRooms()[1]->EnterRoom(kickedUser);				// 로비방 입장 (로비 인덱스 = 1)
 
+	return TRUE;
+}
+
+BOOL PacketProceessor::GotUnrealCheck(Session * sess, const char * data)
+{
+	sess->SetIsUnreal(true);
 	return TRUE;
 }
 

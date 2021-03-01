@@ -28,6 +28,7 @@ public:
 	BOOL GotMakeRoom(Session* sess, const char* data);
 	BOOL GotJoinRoom(Session* sess, const char* data);
 	BOOL GotKick(Session* sess, const char* data);
+	BOOL GotUnrealCheck(Session* sess, const char* data);
 
 	void Chat(Session* sess);
 	void SendWarningMessage(Session* sess, WarningKind warningKind);
