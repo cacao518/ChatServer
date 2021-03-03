@@ -409,7 +409,7 @@ void PacketProceessor::Chat(Session * sess)
 	if (sess->GetIsUnreal())
 	{
 		string message = to_string((int)PacketKind::SendData) + '{' + str + '}';
-		sess->GetCurRoom()->SendData(sess, toClientBuf.c_str());
+		sess->GetCurRoom()->SendAllToRoomMembers(message.c_str());
 	}
 	else
 	{

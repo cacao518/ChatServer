@@ -80,6 +80,8 @@ void Room::SendData(Session * sess, const char * data)
 		if (client->GetSock() == sess->GetSock()) continue;
 		client->GetTcpSock().Send(data);
 
+		if (client->GetIsUnreal() == true) return;
+
 		// 만약 채팅치고 있는 클라였다면 쳤던거 화면에 다시 뿌리기
 		if (client->GetTcpSock().GetTotalBuf().size() != 0)
 		{
@@ -94,6 +96,8 @@ void Room::SendAllToRoomMembers(const char * data)
 	for (auto client : _members)
 	{
 		client->GetTcpSock().Send(data);
+
+		if (client->GetIsUnreal() == true) return;
 
 		// 만약 채팅치고 있는 클라였다면 쳤던거 화면에 다시 뿌리기
 		if (client->GetTcpSock().GetTotalBuf().size() != 0)
