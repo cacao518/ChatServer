@@ -23,7 +23,7 @@ PacketProceessor::PacketProceessor()
 	_command.push_back("/login ");
 	_command.push_back("/help");
 	_command.push_back("/exit");
-	_command.push_back("나는야언리얼");
+	_command.push_back("/i am unreal");
 	_command.push_back("/user");
 	_command.push_back("/room");
 	_command.push_back("/r ");
@@ -32,6 +32,7 @@ PacketProceessor::PacketProceessor()
 	_command.push_back("/make ");
 	_command.push_back("/join ");
 	_command.push_back("/kick ");
+	_command.push_back("/////");
 
 	// 리시브 핸들러 함수 등록
 	_packetHandleMap[PacketKind::Login] = [this](Session* sess, const char* data) { return GotLogin(sess, data); };
@@ -119,12 +120,11 @@ BOOL PacketProceessor::GotLogin(Session* sess, const char* data)
 
 	if (sess->GetIsUnreal())
 	{
-		char sendData[BUFSIZE];
-		*sendData = (char)PacketKind::Login;
-		string msg = "* 로그인에 성공했습니다.";
-		memcpy(sendData + 1, msg.c_str(), msg.size());
-		
-		sess->GetTcpSock().Send(sendData);
+		string message = to_string((int)PacketKind::Login) + '{' + data + '}';
+		sess->GetTcpSock().Send(message.c_str());
+
+		//string message = "/login";
+		//sess->GetTcpSock().Send(message.c_str());
 	}
 	else
 	{
@@ -406,12 +406,20 @@ void PacketProceessor::Chat(Session * sess)
 	printf("[%s : %d]", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 	printf(" %s", str.c_str());
 
-	// 방에 있는 클라들에게 보내기
-	toClientBuf.append("입력> ");
-	sess->GetCurRoom()->SendData(sess, toClientBuf.c_str());
+	if (sess->GetIsUnreal())
+	{
+		string message = to_string((int)PacketKind::SendData) + '{' + str + '}';
+		sess->GetCurRoom()->SendData(sess, toClientBuf.c_str());
+	}
+	else
+	{
+		// 방에 있는 클라들에게 보내기
+		toClientBuf.append("입력> ");
+		sess->GetCurRoom()->SendData(sess, toClientBuf.c_str());
 
-	// 채팅을 보낸 클라이언트 > 커서 다시 표시
-	sess->GetTcpSock().Send("입력> ");
+		// 채팅을 보낸 클라이언트 > 커서 다시 표시
+		sess->GetTcpSock().Send("입력> ");
+	}
 
 	// 버퍼 비우기
 	sess->GetTcpSock().SetBuf('\0');

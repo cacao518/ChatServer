@@ -11,7 +11,7 @@ constexpr int ROOM_NUM_MAX = 50;
 constexpr short BUF_LIMIT_COUNT = 1;
 
 enum class PacketKind {
-	Login,				//		로그인 : /login 닉네임
+	Login = 0,				//		로그인 : /login 닉네임
 	Help,				//		명령어 안내 : /help
 	Exit,				//		종료 : /exit
 	UnrealCheck,		//		언리얼 클라 체크
@@ -23,6 +23,7 @@ enum class PacketKind {
 	MakeRoom,			//		방만들기 : /make 최대인원 방제목
 	JoinRoom,			//		방 참여 : /join 방번호  
 	Kick,				//		강퇴(방장만가능) : /kick 이름
+	SendData,
 	End
 };
 enum class WarningKind {

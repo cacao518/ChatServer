@@ -29,11 +29,14 @@ void Room::EnterRoom(Session * sess)
 	
 	_members.insert(sess);
 
-	string message = "\r\n			< " + _info._roomName + " > \r\n";
-	sess->GetTcpSock().Send(message.c_str());
+	/*if (sess->GetIsUnreal() == false)
+	{*/
+		string message = "\r\n			< " + _info._roomName + " > \r\n";
+		sess->GetTcpSock().Send(message.c_str());
 
-	message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 입장하셨습니다.\r\n\n입력> \0";
-	SendAllToRoomMembers(message.c_str());
+		message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 입장하셨습니다.\r\n\n입력> \0";
+		SendAllToRoomMembers(message.c_str());
+	//}
 }
 
 /// 나가는 세션을 member에서 제거하고, 방에 있는 사람들에게 알리기
@@ -44,18 +47,22 @@ void Room::LeaveRoom(Session * sess)
 	
 	_members.erase(sess);
 
-	string message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 나갔습니다.\r\n\n입력> \0";
-	SendAllToRoomMembers(message.c_str());
-
-	// 나간 사람이 방장이라면 방에 남아있는 사람으로 방장 위임
-	if (_master == sess)
+	if (sess->GetIsUnreal() == false)
 	{
-		auto iter = _members.begin();
-		if (iter != _members.end())
+		string message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 나갔습니다.\r\n\n입력> \0";
+		SendAllToRoomMembers(message.c_str());
+
+
+		// 나간 사람이 방장이라면 방에 남아있는 사람으로 방장 위임
+		if (_master == sess)
 		{
-			SetMaster((*iter));
-			message = "\r\n		 * " + (*iter)->GetPlayerInfo().name + "님으로 방장이 위임되었습니다. \r\n\n입력> \0";
-			SendAllToRoomMembers(message.c_str());
+			auto iter = _members.begin();
+			if (iter != _members.end())
+			{
+				SetMaster((*iter));
+				message = "\r\n		 * " + (*iter)->GetPlayerInfo().name + "님으로 방장이 위임되었습니다. \r\n\n입력> \0";
+				SendAllToRoomMembers(message.c_str());
+			}
 		}
 	}
 
