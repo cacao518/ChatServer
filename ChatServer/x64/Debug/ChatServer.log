@@ -1,7 +1,13 @@
-﻿  RoomManager.cpp
-c:\users\byeongjun\source\repos\chatserver\chatserver\config.h(62): warning C4100: 'msg': 참조되지 않은 정식 매개 변수입니다.
-c:\users\byeongjun\source\repos\chatserver\chatserver\roommanager.cpp(69): warning C4456: 'name' 선언은 이전 로컬 선언을 숨깁니다.
-  c:\users\byeongjun\source\repos\chatserver\chatserver\roommanager.cpp(55): note: 'name' 선언을 참조하십시오.
-c:\users\byeongjun\source\repos\chatserver\chatserver\roommanager.cpp(104): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  ChatServer.vcxproj -> C:\Users\byeongjun\source\repos\ChatServer\x64\Debug\ChatServer.exe
-  ChatServer.vcxproj -> C:\Users\byeongjun\source\repos\ChatServer\x64\Debug\ChatServer.pdb (Full PDB)
+﻿  PacketProcessor.cpp
+c:\users\qudwn\chatserver\chatserver\config.h(62): warning C4100: 'msg': 참조되지 않은 정식 매개 변수입니다.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(41): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(42): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(43): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(44): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(255): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(328): warning C4456: 'message' 선언은 이전 로컬 선언을 숨깁니다.
+  c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(315): note: 'message' 선언을 참조하십시오.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(362): warning C4456: 'message' 선언은 이전 로컬 선언을 숨깁니다.
+  c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(349): note: 'message' 선언을 참조하십시오.
+c:\users\qudwn\chatserver\chatserver\packetprocessor.cpp(404): warning C4100: 'data': 참조되지 않은 정식 매개 변수입니다.
+  ChatServer.vcxproj -> C:\Users\qudwn\ChatServer\x64\Debug\ChatServer.exe

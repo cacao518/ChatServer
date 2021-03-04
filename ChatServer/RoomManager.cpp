@@ -59,6 +59,7 @@ BOOL RoomManager::ShowRoomInfo(Session * sess, UINT roomID)
 	message.append("---------------------------------------------------------\r\n");
 
 	string sendData_unreal;
+	sendData_unreal.append(room->GetRoomInfo()._roomName + ":"); // 방이름
 	for (auto client : room->GetMembers())
 	{
 		bool isMaster = false;
@@ -107,7 +108,7 @@ void RoomManager::ShowRoomList(Session * sess)
 
 
 		// 언리얼 전용
-		sendData_unreal.append(to_string(id) + "(" + name + ")" + "(" + to_string(userNum) + ")");
+		sendData_unreal.append(to_string(id) + "(" + name + ")" + to_string(userNum) + ")");
 	}
 
 	// 언리얼 전용 패킷

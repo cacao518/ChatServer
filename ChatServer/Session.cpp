@@ -6,6 +6,7 @@ Session::Session(TcpSocket socket)
 {
 	_socket = socket;
 	_socket.SetSession(this);
+
 }
 
 Session::~Session()

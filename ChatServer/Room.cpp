@@ -33,14 +33,14 @@ void Room::EnterRoom(Session * sess)
 	{
 		string message = "\r\n			< " + _info._roomName + " > \r\n";
 		sess->GetTcpSock().Send(message.c_str());
+
+
+		message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 입장하셨습니다.\r\n\n입력> \0";
+		SendAllToRoomMembers(message.c_str());
 	}
 
-	string message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 입장하셨습니다.\r\n\n입력> \0";
-	SendAllToRoomMembers(message.c_str());
-	
-
 	// 언리얼 전용
-	message = to_string((int)PacketKind::EnterRoom) + '{' + sess->GetPlayerInfo().name + '}';
+	string message = to_string((int)PacketKind::EnterRoom) + '{' + to_string(_info._roomID) + '}';
 	sess->GetCurRoom()->SendDataToUnreal(sess, message.c_str());
 
 

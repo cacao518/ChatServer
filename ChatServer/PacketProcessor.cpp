@@ -272,8 +272,18 @@ BOOL PacketProceessor::GotWhisper(Session * sess, const char * data)
 		if (client->GetPlayerInfo().name == recvClientName)
 		{
 			if (client->GetIsLogin() == false) return FALSE;
-			string finalSendData = "\r\n [귓속말] [" + recvClientName + "] " + sendData + "\r\n\r\n입력> ";
-			client->GetTcpSock().Send(finalSendData.c_str());
+
+			if (client->GetIsUnreal())
+			{
+				string whisper = "[귓속말] [" + sess->GetPlayerInfo().name + "] " + sendData;
+				string message = to_string((int)PacketKind::Whisper) + '{' + whisper + '}';
+				client->GetTcpSock().Send(message.c_str());
+			}
+			else
+			{
+				string finalSendData = "\r\n [귓속말] [" + sess->GetPlayerInfo().name + "] " + sendData + "\r\n\r\n입력> ";
+				client->GetTcpSock().Send(finalSendData.c_str());
+			}
 			isFindSuccess = true;
 			break;
 		}
@@ -313,6 +323,12 @@ BOOL PacketProceessor::GotMakeRoom(Session * sess, const char * data)
 	sess->SetCurRoom(room);									// 새로운 방으로 설정
 	room->EnterRoom(sess);									// 새로운 방 입장
 
+	if (sess->GetIsUnreal())
+	{
+		string message = to_string((int)PacketKind::JoinRoom) + '{' + to_string(room->GetRoomInfo()._roomID) + '}'; // 입장한 방번호 전송
+		sess->GetTcpSock().Send(message.c_str());
+	}
+
 	return TRUE;
 }
 
@@ -341,6 +357,11 @@ BOOL PacketProceessor::GotJoinRoom(Session * sess, const char * data)
 	sess->SetCurRoom(room);									// 새로운 방으로 설정
 	(*roomIter).second->EnterRoom(sess);					// 새로운 방 입장
 
+	if (sess->GetIsUnreal())
+	{
+		string message = to_string((int)PacketKind::JoinRoom) + '{' + data + '}'; // 입장한 방번호 전송
+		sess->GetTcpSock().Send(message.c_str());
+	}
 	return TRUE;
 }
 
