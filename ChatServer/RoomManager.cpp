@@ -96,6 +96,7 @@ void RoomManager::ShowRoomList(Session * sess)
 	message.append("번호	이름			현재인원수\r\n");
 	message.append("---------------------------------------------------------\r\n");
 
+	string sendData_unreal;
 	for (auto room : _rooms)
 	{
 		UINT id = room.second->GetRoomInfo()._roomID;
@@ -103,7 +104,16 @@ void RoomManager::ShowRoomList(Session * sess)
 		int userNum = room.second->GetMembers().size();
 
 		message.append(" " + to_string(id) + "	" + name + "				"  + to_string(userNum) + "\r\n");
+
+
+		// 언리얼 전용
+		sendData_unreal.append(to_string(id) + "(" + name + ")" + "(" + to_string(userNum) + ")");
 	}
+
+	// 언리얼 전용 패킷
+	string message_unreal = to_string((int)PacketKind::ShowRoom) + '{' + sendData_unreal + '}';
+	if (sess->GetIsUnreal()) sess->GetTcpSock().Send(message_unreal.c_str());
+
 
 	message.append("\r\n");
 	message.append("\r\n입력> ");
