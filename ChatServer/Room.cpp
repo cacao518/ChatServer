@@ -26,17 +26,24 @@ Room::Room(Session * master, UINT roomCode, int max, string name)
 void Room::EnterRoom(Session * sess)
 {
 	if (sess == nullptr) return;
-	
+
 	_members.insert(sess);
 
-	/*if (sess->GetIsUnreal() == false)
-	{*/
+	if (sess->GetIsUnreal() == false)
+	{
 		string message = "\r\n			< " + _info._roomName + " > \r\n";
 		sess->GetTcpSock().Send(message.c_str());
+	}
 
-		message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 입장하셨습니다.\r\n\n입력> \0";
-		SendAllToRoomMembers(message.c_str());
-	//}
+	string message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 입장하셨습니다.\r\n\n입력> \0";
+	SendAllToRoomMembers(message.c_str());
+	
+
+	// 언리얼 전용
+	message = to_string((int)PacketKind::EnterRoom) + '{' + sess->GetPlayerInfo().name + '}';
+	sess->GetCurRoom()->SendDataToUnreal(sess, message.c_str());
+
+
 }
 
 /// 나가는 세션을 member에서 제거하고, 방에 있는 사람들에게 알리기
@@ -44,30 +51,32 @@ void Room::LeaveRoom(Session * sess)
 {
 	if (sess == nullptr) return;
 	if (_members.find(sess) == _members.end()) return;
-	
+
 	_members.erase(sess);
 
-	if (sess->GetIsUnreal() == false)
+
+	string message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 나갔습니다.\r\n\n입력> \0";
+	SendAllToRoomMembers(message.c_str());
+
+
+	// 나간 사람이 방장이라면 방에 남아있는 사람으로 방장 위임
+	if (_master == sess)
 	{
-		string message = "\r\n		 * " + sess->GetPlayerInfo().name + "님이 나갔습니다.\r\n\n입력> \0";
-		SendAllToRoomMembers(message.c_str());
-
-
-		// 나간 사람이 방장이라면 방에 남아있는 사람으로 방장 위임
-		if (_master == sess)
+		auto iter = _members.begin();
+		if (iter != _members.end())
 		{
-			auto iter = _members.begin();
-			if (iter != _members.end())
-			{
-				SetMaster((*iter));
-				message = "\r\n		 * " + (*iter)->GetPlayerInfo().name + "님으로 방장이 위임되었습니다. \r\n\n입력> \0";
-				SendAllToRoomMembers(message.c_str());
-			}
+			SetMaster((*iter));
+			message = "\r\n		 * " + (*iter)->GetPlayerInfo().name + "님으로 방장이 위임되었습니다. \r\n\n입력> \0";
+			SendAllToRoomMembers(message.c_str());
 		}
 	}
 
+	// 언리얼 전용
+	message = to_string((int)PacketKind::LeaveRoom) + '{' + sess->GetPlayerInfo().name + '}';
+	sess->GetCurRoom()->SendDataToUnreal(sess, message.c_str());
+
 	// 방에 아무도 없으면 방을 파괴한다. (단, 로비가 아니어야 함)
-	if (_members.size() == 0 && _info._isLobby == false) 
+	if (_members.size() == 0 && _info._isLobby == false)
 		RoomManager::GetInstance()->RemoveRoom(this);
 }
 
@@ -76,11 +85,12 @@ void Room::SendData(Session * sess, const char * data)
 {
 	for (auto client : _members)
 	{
+		if (client->GetIsUnreal() == true) continue;
+
 		// 채팅을 보낸 클라이언트는 제외
 		if (client->GetSock() == sess->GetSock()) continue;
 		client->GetTcpSock().Send(data);
 
-		if (client->GetIsUnreal() == true) return;
 
 		// 만약 채팅치고 있는 클라였다면 쳤던거 화면에 다시 뿌리기
 		if (client->GetTcpSock().GetTotalBuf().size() != 0)
@@ -95,9 +105,9 @@ void Room::SendAllToRoomMembers(const char * data)
 {
 	for (auto client : _members)
 	{
-		client->GetTcpSock().Send(data);
+		if (client->GetIsUnreal() == true) continue;
 
-		if (client->GetIsUnreal() == true) return;
+		client->GetTcpSock().Send(data);
 
 		// 만약 채팅치고 있는 클라였다면 쳤던거 화면에 다시 뿌리기
 		if (client->GetTcpSock().GetTotalBuf().size() != 0)
@@ -105,6 +115,16 @@ void Room::SendAllToRoomMembers(const char * data)
 			string chatData = client->GetTcpSock().GetTotalBuf();
 			client->GetTcpSock().Send(chatData.c_str());
 		}
+	}
+}
+
+void Room::SendDataToUnreal(Session * sess, const char * data)
+{
+	for (auto client : _members)
+	{
+		if (client->GetIsUnreal() == false) continue;
+
+		client->GetTcpSock().Send(data);
 	}
 }
 

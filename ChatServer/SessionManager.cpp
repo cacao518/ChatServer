@@ -111,7 +111,8 @@ void SessionManager::ShowUserList(Session * sess)
 	string message = "=========================================================\r\n		전체 유저 목록 \r\n=========================================================\r\n";
 	message.append("ID	이름			\r\n");
 	message.append("---------------------------------------------------------\r\n");
-
+	
+	//string sendData_unreal;
 	for (auto client : _clients)
 	{
 		if (client->GetIsLogin() == false) continue;
@@ -119,7 +120,11 @@ void SessionManager::ShowUserList(Session * sess)
 		string name = client->GetPlayerInfo().name;
 
 		message.append(" " + to_string(id) + "	" + name + "\r\n");
+		//sendData_unreal.append(to_string(id) + "\r" + name + "\n");
 	}
+	//// 언리얼 전용 패킷
+	//string message_unreal = to_string((int)PacketKind::ShowUser) + '{' + sendData_unreal + '}';
+	//if (sess->GetIsUnreal()) sess->GetTcpSock().Send(message_unreal.c_str());
 
 	message.append("\r\n");
 	message.append("\r\n입력> ");

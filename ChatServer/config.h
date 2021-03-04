@@ -24,6 +24,8 @@ enum class PacketKind {
 	JoinRoom,			//		방 참여 : /join 방번호  
 	Kick,				//		강퇴(방장만가능) : /kick 이름
 	SendData,
+	EnterRoom,
+	LeaveRoom,
 	End
 };
 enum class WarningKind {

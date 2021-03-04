@@ -17,6 +17,8 @@ public:
 	void SendData(Session* sess, const char* data);			// 세션이 방에 send하는 함수
 	void SendAllToRoomMembers(const char* data);			// 방에 있는 모든 세션들에게 send하는 함수
 
+	void SendDataToUnreal(Session* sess, const char* data);		
+
 	RoomInfo		GetRoomInfo() const { return _info; }
 	set<Session*>&	GetMembers() { return _members; };
 	Session*		GetMaster() const { return _master; }

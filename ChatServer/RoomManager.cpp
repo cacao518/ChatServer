@@ -58,6 +58,7 @@ BOOL RoomManager::ShowRoomInfo(Session * sess, UINT roomID)
 	message.append(" ID	이름			방장\r\n");
 	message.append("---------------------------------------------------------\r\n");
 
+	string sendData_unreal;
 	for (auto client : room->GetMembers())
 	{
 		bool isMaster = false;
@@ -71,7 +72,16 @@ BOOL RoomManager::ShowRoomInfo(Session * sess, UINT roomID)
 			message.append(to_string(id) + "	" + name + "			Master" + "\r\n");
 		else
 			message.append(to_string(id) + "	" + name + "\r\n");
+
+		// 언리얼 전용
+		sendData_unreal.append(to_string(id) + "(" + name + ")");
 	}
+
+	// 언리얼 전용 패킷
+	string message_unreal = to_string((int)PacketKind::ShowRoomInfo) + '{' + sendData_unreal + '}';
+	if (sess->GetIsUnreal()) sess->GetTcpSock().Send(message_unreal.c_str());
+
+
 	message.append("\r\n");
 	message.append("\r\n입력> ");
 	sess->GetTcpSock().Send(message.c_str());

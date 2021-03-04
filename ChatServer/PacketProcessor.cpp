@@ -33,6 +33,8 @@ PacketProceessor::PacketProceessor()
 	_command.push_back("/join ");
 	_command.push_back("/kick ");
 	_command.push_back("/////");
+	_command.push_back("/////");
+	_command.push_back("/////");
 
 	// 리시브 핸들러 함수 등록
 	_packetHandleMap[PacketKind::Login] = [this](Session* sess, const char* data) { return GotLogin(sess, data); };
@@ -398,7 +400,7 @@ void PacketProceessor::Chat(Session * sess)
 	// 보낼 문자열 꾸미기
 	toClientBuf.append("\r\n");
 	string str = "[" + sess->GetPlayerInfo().name + "] : " + sess->GetTcpSock().GetTotalBuf();
-	toClientBuf.append( str );
+	toClientBuf.append(str);
 
 	// 서버에 먼저 출력
 	addrlen = sizeof(clientaddr);
@@ -406,20 +408,17 @@ void PacketProceessor::Chat(Session * sess)
 	printf("[%s : %d]", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 	printf(" %s", str.c_str());
 
-	if (sess->GetIsUnreal())
-	{
-		string message = to_string((int)PacketKind::SendData) + '{' + str + '}';
-		sess->GetCurRoom()->SendAllToRoomMembers(message.c_str());
-	}
-	else
-	{
-		// 방에 있는 클라들에게 보내기
-		toClientBuf.append("입력> ");
-		sess->GetCurRoom()->SendData(sess, toClientBuf.c_str());
+	// 방에 있는 언리얼 클라들에게 보내기
+	string message = to_string((int)PacketKind::SendData) + '{' + str + '}';
+	sess->GetCurRoom()->SendDataToUnreal(sess, message.c_str());
 
-		// 채팅을 보낸 클라이언트 > 커서 다시 표시
-		sess->GetTcpSock().Send("입력> ");
-	}
+	// 방에 있는 클라들에게 보내기
+	toClientBuf.append("입력> ");
+	sess->GetCurRoom()->SendData(sess, toClientBuf.c_str());
+
+	// 채팅을 보낸 클라이언트 > 커서 다시 표시
+	sess->GetTcpSock().Send("입력> ");
+
 
 	// 버퍼 비우기
 	sess->GetTcpSock().SetBuf('\0');
